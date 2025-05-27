@@ -39,7 +39,7 @@ def generate_qr(name):
     """Generate a QR code linking to the student's details page on Render"""
     student_data = get_student_data(name)
     if student_data:
-        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"  
+        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
 
         qr = qrcode.QRCode(version=None, box_size=10, border=5)
         qr.add_data(qr_url)
@@ -47,9 +47,15 @@ def generate_qr(name):
         img = qr.make_image(fill_color="black", back_color="white")
 
         img_path = os.path.join(static_dir, f"{name}_qrcode.png")
+
+        print(f"Generating QR Code for: {name}")
+        print(f"Saving QR Code at: {img_path}")
+
         img.save(img_path)
 
         return img_path
+
+    print("QR Code generation failed!")  
     return None
 
 @app.route("/", methods=["GET", "POST"])
