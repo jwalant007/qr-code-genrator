@@ -1,6 +1,7 @@
 import os
 import mysql.connector
 import qrcode
+import socket
 from flask import Flask, render_template, request
 
 templates_dir = "templates"
@@ -11,18 +12,12 @@ os.makedirs(static_dir, exist_ok=True)
 app = Flask(__name__, template_folder=templates_dir, static_folder=static_dir)
 
 DB_CONFIG = {
-    "host": "127.0.0.1",  
-    "user": "root",  
-    "password": "Jwalant_007",  
+    "host": "0.0.0.0",
+    "user": "root",
+    "password": "Jwalant_007",
     "database": "listdb",
     "auth_plugin": "mysql_native_password"
 }
-
-import socket
-def get_local_ip():
-    return socket.gethostbyname(socket.gethostname())
-
-LOCAL_IP = get_local_ip()
 
 def get_student_data(name):
     """Fetch student data from MySQL"""
@@ -42,10 +37,10 @@ def get_student_data(name):
         return None
 
 def generate_qr(name):
-    """Generate a QR code linking to the student's details page"""
+    """Generate a QR code linking to the student's details page on Render"""
     student_data = get_student_data(name)
     if student_data:
-        qr_url = f"http://{LOCAL_IP}:80/student/{name}"  
+        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"  # ✅ Updated for Render
 
         qr = qrcode.QRCode(version=None, box_size=10, border=5)
         qr.add_data(qr_url)
@@ -74,4 +69,5 @@ def student_page(name):
     return "<h1>Student not found</h1>", 404
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=80, debug=True)  
+    port = int(os.environ.get("PORT", 10000))  # 🔄 Dynamically get PORT for Render
+    app.run(host="0.0.0.0", port=port, debug=True)  # ✅ Updated host & port settings
