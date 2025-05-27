@@ -1,9 +1,8 @@
 import os
 import mysql.connector
 import qrcode
-import socket
 from flask import Flask, render_template, request
-
+from waitress import serve  
 templates_dir = "templates"
 static_dir = "static"
 os.makedirs(templates_dir, exist_ok=True)
@@ -12,7 +11,7 @@ os.makedirs(static_dir, exist_ok=True)
 app = Flask(__name__, template_folder=templates_dir, static_folder=static_dir)
 
 DB_CONFIG = {
-    "host": "0.0.0.0",
+    "host": "127.0.0.1",
     "user": "root",
     "password": "Jwalant_007",
     "database": "listdb",
@@ -40,7 +39,7 @@ def generate_qr(name):
     """Generate a QR code linking to the student's details page on Render"""
     student_data = get_student_data(name)
     if student_data:
-        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"  # ✅ Updated for Render
+        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"  
 
         qr = qrcode.QRCode(version=None, box_size=10, border=5)
         qr.add_data(qr_url)
@@ -69,5 +68,11 @@ def student_page(name):
     return "<h1>Student not found</h1>", 404
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))  # 🔄 Dynamically get PORT for Render
-    app.run(host="0.0.0.0", port=port, debug=True)  # ✅ Updated host & port settings
+    port = int(os.environ.get("PORT", 10000))  
+
+    if os.name == "nt":  
+        print("Running Flask app with Waitress (Windows)")
+        serve(app, host="0.0.0.0", port=port)
+    else:  
+        from gunicorn.app.wsgiapp import run
+        run()
