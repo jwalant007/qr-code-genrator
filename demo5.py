@@ -2,7 +2,7 @@ import os
 import mysql.connector
 import qrcode
 from flask import Flask, render_template, request, send_file
-from waitress import serve  
+from waitress import serve
 from io import BytesIO
 
 templates_dir = "templates"
@@ -17,6 +17,15 @@ DB_CONFIG = {
     "database": "listdb"
 }
 
+def test_db_connection():
+    """Test MySQL connection independently"""
+    try:
+        conn = mysql.connector.connect(**DB_CONFIG)
+        print("Database connected successfully!")
+        conn.close()
+    except mysql.connector.Error as err:
+        print(f"Connection error: {err}")
+
 def get_student_data(name):
     """Fetch student data from MySQL"""
     try:
@@ -27,7 +36,7 @@ def get_student_data(name):
         cursor.close()
         conn.close()
 
-        print(f"Fetched student data: {student}")  
+        print(f"Fetched student data: {student}")
 
         if student:
             return {desc: val for desc, val in zip(["Name", "sub", "marks", "total_marks", "date"], student)}
@@ -61,7 +70,7 @@ def create_app():
         student_data = get_student_data(name)
         if student_data:
             qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
-            print(f"Generating QR Code for: {name} with URL: {qr_url}")  
+            print(f"Generating QR Code for: {name} with URL: {qr_url}")
 
             qr = qrcode.QRCode(version=None, box_size=10, border=5)
             qr.add_data(qr_url)
@@ -72,22 +81,23 @@ def create_app():
             img.save(qr_io, format="PNG")
             qr_io.seek(0)
 
-            print(f"QR Code successfully generated for: {name}")  
+            print(f"QR Code successfully generated for: {name}")
 
             return send_file(qr_io, mimetype="image/png")
 
-        print("QR Code generation failed!")  
+        print("QR Code generation failed!")
         return "<h1>QR Code generation failed!</h1>", 404
 
     return app
 
 if __name__ == "__main__":
+    test_db_connection()  # Test DB connectivity on startup
     app = create_app()
-    port = int(os.environ.get("PORT", 5000))  
+    port = int(os.environ.get("PORT", 5000))
 
-    if os.name == "nt":  
+    if os.name == "nt":
         print("Running Flask app with Waitress (Windows)")
         serve(app, host="0.0.0.0", port=port)
-    else:  
-        import os
+    else:
         os.system(f"gunicorn -b 0.0.0.0:{port} app:create_app")
+        
