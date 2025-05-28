@@ -27,6 +27,8 @@ def get_student_data(name):
         cursor.close()
         conn.close()
 
+        print(f"Fetched student data: {student}")  
+
         if student:
             return {desc: val for desc, val in zip(["Name", "sub", "marks", "total_marks", "date"], student)}
         return None
@@ -59,7 +61,8 @@ def create_app():
         student_data = get_student_data(name)
         if student_data:
             qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
-            
+            print(f"Generating QR Code for: {name} with URL: {qr_url}")  
+
             qr = qrcode.QRCode(version=None, box_size=10, border=5)
             qr.add_data(qr_url)
             qr.make(fit=True)
@@ -69,8 +72,11 @@ def create_app():
             img.save(qr_io, format="PNG")
             qr_io.seek(0)
 
+            print(f"QR Code successfully generated for: {name}")  
+
             return send_file(qr_io, mimetype="image/png")
 
+        print("QR Code generation failed!")  
         return "<h1>QR Code generation failed!</h1>", 404
 
     return app
