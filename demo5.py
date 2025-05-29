@@ -51,7 +51,7 @@ def create_app():
 
     @app.route("/", methods=["GET", "POST"])
     def index():
-        qr_path = None
+        qr_path = f"/generate_qr/{name}"
         if request.method == "POST":
             name = request.form["name"]
             qr_path = generate_qr(name)
@@ -91,7 +91,7 @@ def create_app():
     return app
 
 if __name__ == "__main__":
-    test_db_connection()  # Test DB connectivity on startup
+    test_db_connection()  
     app = create_app()
     port = int(os.environ.get("PORT", 5000))
 
