@@ -15,7 +15,7 @@ DB_CONFIG = {
     "user": "root",
     "password": "jwalant",
     "database": "listdb",
-    "port" : 3307
+    "port" : 3306
 }
 
 def test_db_connection():
