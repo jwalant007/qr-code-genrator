@@ -8,7 +8,7 @@ from io import BytesIO
 DB_CONFIG = {
     "host": os.getenv("DB_HOST", "127.0.0.1"),
     "user": os.getenv("DB_USER", "root"),
-    "password": os.getenv("DB_PASSWORD", "Jwalant_007"),
+    "password": os.getenv("DB_PASSWORD", "jwalant"),
     "database": os.getenv("DB_NAME", "listdb"),
     "port": int(os.getenv("DB_PORT", 3306))
 }
