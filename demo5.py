@@ -11,10 +11,11 @@ os.makedirs(templates_dir, exist_ok=True)
 os.makedirs(static_dir, exist_ok=True)
 
 DB_CONFIG = {
-    "host": "127.0.0.1",
+    "host": "0.0.0.1",
     "user": "root",
     "password": "Jwalant_007",
-    "database": "listdb"
+    "database": "listdb",
+    "port"  :  3307
 }
 
 def test_db_connection():
