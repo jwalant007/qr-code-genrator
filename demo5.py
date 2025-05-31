@@ -11,9 +11,9 @@ os.makedirs(templates_dir, exist_ok=True)
 os.makedirs(static_dir, exist_ok=True)
 
 DB_CONFIG = {
-    "host": "0.0.0.1",
+    "host": "127.0.0.1",
     "user": "root",
-    "password": "Jwalant_007",
+    "password": "jwalant",
     "database": "listdb",
 }
 
@@ -97,7 +97,7 @@ if __name__ == "__main__":
 
     if os.name == "nt":
         print("Running Flask app with Waitress (Windows)")
-        serve(app, host="0.0.0.0", port=port)
+        serve(app, host="127.0.0.1", port=port)
     else:
         os.system(f"gunicorn -b 0.0.0.0:{port} app:create_app")
         
