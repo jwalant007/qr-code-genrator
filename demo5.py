@@ -15,7 +15,6 @@ DB_CONFIG = {
     "user": "root",
     "password": "Jwalant_007",
     "database": "listdb",
-    "port"  :  3307
 }
 
 def test_db_connection():
