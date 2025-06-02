@@ -37,7 +37,7 @@ def create_app():
     @app.route("/generate_qr/<name>")
     def generate_qr(name):
         """Generate a QR code dynamically"""
-        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}.png"
+        qr_url = f"https:/qr-code-genrator-xpcv.onrender.com/student/{name}"
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
         qr.add_data(qr_url)
         qr.make(fit=True)
@@ -48,37 +48,6 @@ def create_app():
         qr_io.seek(0)
 
         return send_file(qr_io, mimetype="image/png")
-
-    @app.route("/generate", methods=["POST"])
-    def generate_local_qr():
-        """Generate a QR code and save it locally"""
-        name = request.form["name"]
-
-        # Ensure static folder exists
-        if not os.path.exists("static"):
-            os.makedirs("static")
-
-        # Generate and save QR code dynamically
-        img = qrcode.make(name)
-        img_path = os.path.join("static", f"{name}_qr.png")
-        img.save(img_path)
-
-        return render_template("index.html", qr_path=img_path, message="QR Code generated successfully!")
-
-    @app.route("/students")
-    def get_students():
-        """Fetch and display student data from the database"""
-        try:
-            conn = mysql.connector.connect(**DB_CONFIG)
-            cursor = conn.cursor(dictionary=True)
-            cursor.execute("SELECT * FROM students")
-            students = cursor.fetchall()
-            conn.close()
-
-            return render_template("students.html", students=students)  # Render data in HTML template
-
-        except mysql.connector.Error as err:
-            return {"error": str(err)}  # Return JSON error response
 
     return app
 
