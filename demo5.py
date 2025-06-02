@@ -51,10 +51,11 @@ def create_app():
 
     return app
 
-# Initialize Flask application
+# Initialize Flask application for Gunicorn
+app = create_app()  # Define the app globally
+
 if __name__ == "__main__":
     test_db_connection()
-    app = create_app()
     port = int(os.getenv("PORT", 5000))
 
     print(f" Running Flask app on port {port} with Waitress")
