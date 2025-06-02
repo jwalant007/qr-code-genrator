@@ -34,20 +34,6 @@ def create_app():
             qr_path = f"/generate_qr/{name}"
         return render_template("index.html", qr_path=qr_path)
 
-    @app.route("/generate_qr/<name>")
-    def generate_qr(name):
-        """Generate a QR code dynamically"""
-        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}.png"
-        qr = qrcode.QRCode(version=1, box_size=10, border=5)
-        qr.add_data(qr_url)
-        qr.make(fit=True)
-        img = qr.make_image(fill_color="black", back_color="white")
-
-        qr_io = BytesIO()
-        img.save(qr_io, format="PNG")
-        qr_io.seek(0)
-
-        return send_file(qr_io, mimetype="image/png")
 
     @app.route("/students")
     def get_students():
