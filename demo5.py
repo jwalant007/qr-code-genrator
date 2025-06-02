@@ -32,7 +32,7 @@ def create_app():
         if request.method == "POST":
             name = request.form["name"]
             qr_path = f"/generate_qr/{name}"
-        return render_template("index.html", qr_path=qr_path)
+        return render_template("C:\python vs\New folder\templates\index.html", qr_path=qr_path)
 
 
     @app.route("/students")
@@ -45,7 +45,7 @@ def create_app():
             students = cursor.fetchall()
             conn.close()
 
-            return render_template("students.html", students=students)  # Render data in HTML template
+            return render_template("C:\python vs\New folder\templates\student.html", students=students)  # Render data in HTML template
 
         except mysql.connector.Error as err:
             return {"error": str(err)}  # Return JSON error response
