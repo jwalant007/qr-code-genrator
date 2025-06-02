@@ -50,20 +50,12 @@ def create_app():
         return send_file(qr_io, mimetype="image/png")
 
     return app
-app = Flask(__name__)
 
-@app.route("/")
-def home():
-    return "Hello, Flask!"
-
+# Initialize Flask application
 if __name__ == "__main__":
-    app.run()
-
-
-if __name__ == "__main__":
-    test_db_connection()  
+    test_db_connection()
     app = create_app()
     port = int(os.getenv("PORT", 5000))
-    
+
     print(f" Running Flask app on port {port} with Waitress")
     serve(app, host="0.0.0.0", port=port)
