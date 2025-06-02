@@ -50,6 +50,15 @@ def create_app():
         return send_file(qr_io, mimetype="image/png")
 
     return app
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "Hello, Flask!"
+
+if __name__ == "__main__":
+    app.run()
+
 
 if __name__ == "__main__":
     test_db_connection()  
