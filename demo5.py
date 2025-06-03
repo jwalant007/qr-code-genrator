@@ -17,8 +17,11 @@ def test_db_connection():
     """Test MySQL connection independently"""
     try:
         conn = mysql.connector.connect(**DB_CONFIG)
-        print(" Database connected successfully!")
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM students")
+        count = cursor.fetchone()[0]
         conn.close()
+        print(f" Database connected successfully! Students in DB: {count}")
     except mysql.connector.Error as err:
         print(f" Connection error: {err}")
 
@@ -37,7 +40,7 @@ def create_app():
     @app.route("/generate_qr/<name>")
     def generate_qr(name):
         """Generate a QR code dynamically"""
-        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/students/{name}"
+        qr_url = f"http://127.0.0.1:5000/students/{name}"  # Local version
         print(f"Generating QR for: {qr_url}")  
 
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
@@ -53,20 +56,17 @@ def create_app():
 
     @app.route("/students/<name>")
     def show_student(name):
-        """Fetch student data from MySQL"""
+        """Fetch student data from MySQL and render template"""
         try:
             conn = mysql.connector.connect(**DB_CONFIG)
-            cursor = conn.cursor()
-            cursor.execute("SELECT id, name, marks,total_marks FROM students WHERE name = %s", (name,))
-            data = cursor.fetchone()
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute("SELECT id, name, marks, total_marks FROM students WHERE name = %s", (name,))
+            student = cursor.fetchone()
             conn.close()
 
-            if data:
-                return f"Student Profile: id - {data[0]}, name - {data[1]}, marks - {data[2]}, total_marks - {data[3]}"
-            else:
-                return " Student not found."
+            return render_template("student.html", student=student)
         except mysql.connector.Error as err:
-            return f"Database connection error: {err}"
+            return f" Database connection error: {err}"
 
     return app
 
