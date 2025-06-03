@@ -37,7 +37,7 @@ def create_app():
     @app.route("/generate_qr/<name>")
     def generate_qr(name):
         """Generate a QR code dynamically"""
-        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
+        qr_url = f"https://127.0.0.1:5000/student/{name}"
         print(f"Generating QR for: {qr_url}")  # Debugging
 
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
