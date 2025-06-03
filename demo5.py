@@ -6,7 +6,7 @@ from waitress import serve
 from io import BytesIO
 
 DB_CONFIG = {
-    "host": os.getenv("DB_HOST", "127.0.0.1"),
+    "host": os.getenv("DB_HOST", "0.0.0.1"),
     "user": os.getenv("DB_USER", "root"),
     "password": os.getenv("DB_PASSWORD", "jwalant"),
     "database": os.getenv("DB_NAME", "listdb"),
@@ -17,10 +17,10 @@ def test_db_connection():
     """Test MySQL connection independently"""
     try:
         conn = mysql.connector.connect(**DB_CONFIG)
-        print("✅ Database connected successfully!")
+        print(" Database connected successfully!")
         conn.close()
     except mysql.connector.Error as err:
-        print(f"❌ Connection error: {err}")
+        print(f" Connection error: {err}")
 
 def create_app():
     """Initialize Flask app"""
@@ -38,7 +38,7 @@ def create_app():
     def generate_qr(name):
         """Generate a QR code dynamically"""
         qr_url = f"https://qr-code-genrator-xpcv.onrender.com/students/{name}"
-        print(f"Generating QR for: {qr_url}")  # Debugging
+        print(f"Generating QR for: {qr_url}")  
 
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
         qr.add_data(qr_url)
@@ -64,17 +64,16 @@ def create_app():
             if data:
                 return f"Student Profile: Name - {data[0]}, Score - {data[1]}"
             else:
-                return "❌ Student not found."
+                return " Student not found."
         except mysql.connector.Error as err:
-            return f"⚠️ Database connection error: {err}"
+            return f"Database connection error: {err}"
 
     return app
 
-# Initialize Flask application for Gunicorn
 app = create_app()
 
 if __name__ == "__main__":
     test_db_connection()
     port = int(os.getenv("PORT", 5000))
-    print(f"🚀 Running Flask app on port {port} with Waitress")
+    print(f" Running Flask app on port {port} with Waitress")
     serve(app, host="0.0.0.0", port=port)
