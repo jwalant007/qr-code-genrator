@@ -33,14 +33,12 @@ def index():
         qr_path = f"/generate_qr/{name}"
     return render_template("index.html", qr_path=qr_path)
 
-@app.route("/generate_qr")
-def generate_qr():
-    """Generate a QR code with database output"""
-    data = get_data()
-    formatted_data = "\n".join([f"Name: {row[0]}, Score: {row[1]}" for row in data])
-
+@app.route("/generate_qr/<name>")
+def generate_qr(name):
+    """Generate a QR code dynamically using student name"""
+    qr_url = f"C:\python vs\New folder\backup\listdb.sql{name}"
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
-    qr.add_data(formatted_data)
+    qr.add_data(qr_url)
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
 
