@@ -37,8 +37,8 @@ def create_app():
     @app.route("/generate_qr/<name>")
     def generate_qr(name):
         """Generate a QR code dynamically"""
-        qr_url = f"https://127.0.0.1/listdb/students/{name}"
-        print(f"Generating QR for: {qr_url}")  
+        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/students/{name}"
+        print(f"Generating QR for: {qr_url}")  # Debugging
 
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
         qr.add_data(qr_url)
@@ -50,6 +50,11 @@ def create_app():
         qr_io.seek(0)
 
         return send_file(qr_io, mimetype="image/png")
+
+    @app.route("/students/<name>")
+    def show_student(name):
+        """Display student profile"""
+        return f"Student Profile: {name} - No database connection yet!"
 
     return app
 
