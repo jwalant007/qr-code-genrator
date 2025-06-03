@@ -36,12 +36,11 @@ def index():
 @app.route("/generate_qr/<name>")
 def generate_qr(name):
     """Generate a QR code dynamically using student name"""
-    qr_url = f"C:\\python vs\\New folder\\backup\\listdb.sql{name}"
-    qr = qrcode.QRCode(version=1, box_size=10, border=5)
-    qr.add_data(qr_url)
-    qr.make(fit=True)
+    qr_url = f"http://127.0.0.1:5000/student/{name}"
     img = qr.make_image(fill_color="black", back_color="white")
-
+    qr = qrcode.QRCode(version=1, box_size=10, border=5)
+    qr.add_data(qr_url)  # Pass the correct URL
+    qr.make(fit=True)
     qr_io = BytesIO()
     img.save(qr_io, format="PNG")
     qr_io.seek(0)
