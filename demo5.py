@@ -39,7 +39,7 @@ def generate_qr(name):
   qr.add_data("https://www.example.com")  # Test with a simple URL
   qr.make(fit=True)
 
-img =qrcode.make_image(fill_color="black", back_color="white")
+img =qr.make_image(fill_color="black", back_color="white")
 img.show()
 
 if __name__ == "__main__":
