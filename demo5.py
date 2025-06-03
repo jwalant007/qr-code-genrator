@@ -57,12 +57,12 @@ def create_app():
         try:
             conn = mysql.connector.connect(**DB_CONFIG)
             cursor = conn.cursor()
-            cursor.execute("SELECT name, marks,total_marks FROM students WHERE name = %s", (name,))
+            cursor.execute("SELECT id, name, marks,total_marks FROM students WHERE name = %s", (name,))
             data = cursor.fetchone()
             conn.close()
 
             if data:
-                return f"Student Profile: Name - {data[0]}, Score - {data[1]}"
+                return f"Student Profile: id - {data[0]}, name - {data[1]}, marks - {data[2]}, total_marks - {data[3]}"
             else:
                 return " Student not found."
         except mysql.connector.Error as err:
