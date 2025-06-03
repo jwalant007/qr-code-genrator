@@ -8,13 +8,14 @@ from io import BytesIO
 app = Flask(__name__)
 
 # Connect to MySQL
-def get_data():
-    conn = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="yourpassword",
-        database="yourdb"
-    )
+DB_CONFIG = {
+    "host": os.getenv("DB_HOST", "127.0.0.1"),
+    "user": os.getenv("DB_USER", "root"),
+    "password": os.getenv("DB_PASSWORD", "jwalant"),
+    "database": os.getenv("DB_NAME", "listdb"),
+    "port": int(os.getenv("DB_PORT", 3306))
+}
+
     cursor = conn.cursor()
     cursor.execute("SELECT name, score FROM students LIMIT 5")  # Modify the query as needed
     data = cursor.fetchall()
