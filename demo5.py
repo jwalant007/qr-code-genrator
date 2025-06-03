@@ -7,7 +7,7 @@ from io import BytesIO
 
 app = Flask(__name__)
 
-# Connect to MySQL
+# Database Config
 DB_CONFIG = {
     "host": os.getenv("DB_HOST", "127.0.0.1"),
     "user": os.getenv("DB_USER", "root"),
@@ -16,32 +16,22 @@ DB_CONFIG = {
     "port": int(os.getenv("DB_PORT", 3306))
 }
 
+def get_data():
+    """Fetch data from MySQL"""
+    conn = mysql.connector.connect(**DB_CONFIG)
     cursor = conn.cursor()
-    cursor.execute("SELECT name, score FROM students LIMIT 5")  # Modify the query as needed
+    cursor.execute("SELECT name, score FROM students LIMIT 5")
     data = cursor.fetchall()
     conn.close()
     return data
 
-def test_db_connection():
-    """Test MySQL connection independently"""
-    try:
-        conn = mysql.connector.connect(**DB_CONFIG)
-        print(" Database connected successfully!")
-        conn.close()
-    except mysql.connector.Error as err:
-        print(f" Connection error: {err}")
-
-def create_app():
-    """Initialize Flask app"""
-    app = Flask(__name__)
-
-    @app.route("/", methods=["GET", "POST"])
-    def index():
-        qr_path = ""
-        if request.method == "POST":
-            name = request.form["name"]
-            qr_path = f"/generate_qr/{name}"
-        return render_template("index.html", qr_path=qr_path)
+@app.route("/", methods=["GET", "POST"])
+def index():
+    qr_path = ""
+    if request.method == "POST":
+        name = request.form["name"]
+        qr_path = f"/generate_qr/{name}"
+    return render_template("index.html", qr_path=qr_path)
 
 @app.route("/generate_qr")
 def generate_qr():
