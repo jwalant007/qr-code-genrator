@@ -74,6 +74,6 @@ app = create_app()
 
 if __name__ == "__main__":
     test_db_connection()
-    port = int(os.getenv("PORT", 5000))
+    port = int(os.getenv("PORT", 3306))
     print(f" Running Flask app on port {port} with Waitress")
     serve(app, host="127.0.0.1", port=port)
