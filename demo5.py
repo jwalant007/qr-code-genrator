@@ -37,7 +37,7 @@ def create_app():
     @app.route("/generate_qr/<name>")
     def generate_qr(name):
         """Generate a QR code dynamically"""
-        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/students/{name}"
+        qr_url = f"https://127.0.0.1/students/{name}"
         print(f"Generating QR for: {qr_url}")  
 
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
@@ -76,4 +76,4 @@ if __name__ == "__main__":
     test_db_connection()
     port = int(os.getenv("PORT", 5000))
     print(f" Running Flask app on port {port} with Waitress")
-    serve(app, host="0.0.0.1", port=port)
+    serve(app, host="127.0.0.1", port=port)
