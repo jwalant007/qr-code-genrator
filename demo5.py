@@ -53,8 +53,20 @@ def create_app():
 
     @app.route("/students/<name>")
     def show_student(name):
-        """Display student profile"""
-        return f"Student Profile: {name} - No database connection yet!"
+        """Fetch student data from MySQL"""
+        try:
+            conn = mysql.connector.connect(**DB_CONFIG)
+            cursor = conn.cursor()
+            cursor.execute("SELECT name, score FROM students WHERE name = %s", (name,))
+            data = cursor.fetchone()
+            conn.close()
+
+            if data:
+                return f"Student Profile: Name - {data[0]}, Score - {data[1]}"
+            else:
+                return "❌ Student not found."
+        except mysql.connector.Error as err:
+            return f"⚠️ Database connection error: {err}"
 
     return app
 
