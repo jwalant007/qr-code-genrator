@@ -6,7 +6,7 @@ from waitress import serve
 from io import BytesIO
 
 DB_CONFIG = {
-    "host": os.getenv("DB_HOST", "0.0.0.1"),
+    "host": os.getenv("DB_HOST", "127.0.0.1"),
     "user": os.getenv("DB_USER", "root"),
     "password": os.getenv("DB_PASSWORD", "jwalant"),
     "database": os.getenv("DB_NAME", "listdb"),
@@ -76,4 +76,4 @@ if __name__ == "__main__":
     test_db_connection()
     port = int(os.getenv("PORT", 5000))
     print(f" Running Flask app on port {port} with Waitress")
-    serve(app, host="0.0.0.0", port=port)
+    serve(app, host="127.0.0.1", port=port)
