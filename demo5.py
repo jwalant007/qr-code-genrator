@@ -1,6 +1,8 @@
-from flask import Flask, send_file
+import os
 import mysql.connector
 import qrcode
+from flask import Flask, render_template, request, send_file
+from waitress import serve
 from io import BytesIO
 
 app = Flask(__name__)
