@@ -57,7 +57,7 @@ def create_app():
         try:
             conn = mysql.connector.connect(**DB_CONFIG)
             cursor = conn.cursor()
-            cursor.execute("SELECT name, score FROM students WHERE name = %s", (name,))
+            cursor.execute("SELECT name, marks,total_marks FROM students WHERE name = %s", (name,))
             data = cursor.fetchone()
             conn.close()
 
