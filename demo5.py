@@ -12,6 +12,11 @@ DB_CONFIG = {
     "database": os.getenv("DB_NAME", "listdb"),
     "port": int(os.getenv("DB_PORT", 3306))
 }
+try:
+    conn = mysql.connector.connect(**DB_CONFIG)
+    print("Connection successful!")
+except mysql.connector.Error as err:
+    print(f"Error: {err}")
 
 def test_db_connection():
     """Test MySQL connection independently"""
