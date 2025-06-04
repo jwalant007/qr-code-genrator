@@ -4,30 +4,37 @@ import qrcode
 from flask import Flask, render_template, request, send_file
 from waitress import serve
 from io import BytesIO
+from mysql.connector import pooling
 
+# Database Configuration for Connection Pooling
+DB_CONFIG = {
+    "host": "127.0.0.1",
+    "user": "root",
+    "password": "jwalant",
+    "database": "listdb",
+    "port": 3306
+}
 
-conn = mysql.connector.connect(
-    host="127.0.0.1",
-    user="root",
-    password="jwalant",
-    database="listdb",
-    port=3306
-)
+# Creating Connection Pool
+pool = pooling.MySQLConnectionPool(pool_name="mypool", pool_size=5, **DB_CONFIG)
+
+def get_connection():
+    """Fetch a connection from the pool"""
+    return pool.get_connection()
+
 def test_db_connection():
     """Test MySQL connection independently"""
     try:
-        conn = mysql.connector.connect(**conn)
+        conn = get_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM students")
         count = cursor.fetchone()[0]
         conn.close()
-        print(f" Database connected successfully! Students in DB: {count}")
+        print(f"Database connected successfully! Students in DB: {count}")
     except mysql.connector.Error as err:
-        print(f" Connection error: {err}")
-
+        print(f"Connection error: {err}")
 
 print("Connected successfully!")
-conn.close()
 
 def create_app():
     """Initialize Flask app"""
@@ -62,7 +69,7 @@ def create_app():
     def show_student(name):
         """Fetch student data from MySQL and render template"""
         try:
-            conn = mysql.connector.connect(**conn)
+            conn = get_connection()
             cursor = conn.cursor(dictionary=True)
             cursor.execute("SELECT id, name, marks, total_marks FROM students WHERE name = %s", (name,))
             student = cursor.fetchone()
@@ -70,7 +77,7 @@ def create_app():
 
             return render_template("student.html", student=student)
         except mysql.connector.Error as err:
-            return f" Database connection error: {err}"
+            return f"Database connection error: {err}"
 
     return app
 
@@ -79,5 +86,5 @@ app = create_app()
 if __name__ == "__main__":
     test_db_connection()
     port = int(os.getenv("PORT", 5000))
-    print(f" Running Flask app on port {port} with Waitress")
+    print(f"Running Flask app on port {port} with Waitress")
     serve(app, host="127.0.0.1", port=port)
