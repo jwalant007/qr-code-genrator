@@ -71,7 +71,7 @@ def create_app():
             student = cursor.fetchone()
             conn.close()
 
-            return render_template("student.html", student=student)
+            return render_template("index.html", student=student)
         except mysql.connector.Error as err:
             return f" Database connection error: {err}"
 
