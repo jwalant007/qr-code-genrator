@@ -4,19 +4,21 @@ import qrcode
 from flask import Flask, render_template, request, send_file
 from waitress import serve
 from io import BytesIO
-
 DB_CONFIG = {
-    "host": os.getenv("DB_HOST", "127.0.0.1"),
-    "user": os.getenv("DB_USER", "root"),
-    "password": os.getenv("DB_PASSWORD", "jwalant"),
-    "database": os.getenv("DB_NAME", "listdb"),
-    "port": int(os.getenv("DB_PORT", 3306))
+    "host": "127.0.0.1",
+    "user": "root",
+    "password": "jwalant",
+    "database": "listdb",
+    "port": 3306
 }
+
 try:
     conn = mysql.connector.connect(**DB_CONFIG)
-    print("Connection successful!")
+    print("Connected successfully!")
+    conn.close()
 except mysql.connector.Error as err:
     print(f"Error: {err}")
+
 
 def test_db_connection():
     """Test MySQL connection independently"""
