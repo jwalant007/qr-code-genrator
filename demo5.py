@@ -76,7 +76,7 @@ def create_app():
         #qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
         #qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student?name={name}"
         
-        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student?name={name}"
+        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/templates/student?name={name}"
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
         qr.add_data(qr_url)
         qr.make(fit=True)
