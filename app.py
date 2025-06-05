@@ -25,23 +25,19 @@ def test_db_connection():
         conn.close()
     except mysql.connector.Error as err:
         print(f" Connection error: {err}")
-'''def fetch_data():
-    """Fetch all data from the specified table."""
-   try:
-        conn = mysql.connector.connect(**DB_CONFIG)
-        cursor = conn.cursor(dictionary=True)
-
-        query = f"SELECT * FROM {TABLE_NAME}"  # Using TABLE_NAME separately
-        cursor.execute(query)
-        result = cursor.fetchall()
-
-        conn.close()
-        return result
+def fetch_data():
+    try:
+        with mysql.connector.connect(**DB_CONFIG) as conn:
+            with conn.cursor(dictionary=True) as cursor:
+                query = f"SELECT * FROM '{TABLE_NAME}'"  # Using TABLE_NAME separately
+                cursor.execute(query)
+                return cursor.fetchall()
+            data = fetch_data()
+            if not data:
+             print("No records found.")
     except mysql.connector.Error as err:
         print(f"Error fetching data: {err}")
-        return []'''
-
-
+        return []
 
 def create_app():
     """Initialize Flask app"""
@@ -59,7 +55,6 @@ def create_app():
     def generate_qr(name):
         """Generate a QR code dynamically"""
         qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
-        #qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student?name={name}"
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
         qr.add_data(qr_url)
         qr.make(fit=True)
