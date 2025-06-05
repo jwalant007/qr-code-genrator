@@ -74,9 +74,7 @@ def create_app():
     def generate_qr(name):
         """Generate a QR code dynamically"""
         #qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
-        #qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student?name={name}"
-        
-        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/templates/student?name={name}"
+        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student?name={name}"
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
         qr.add_data(qr_url)
         qr.make(fit=True)
@@ -92,7 +90,7 @@ def create_app():
     def display_student(name):
         """Fetch and display a specific student's data"""
         student = fetch_student_data(name)
-        return render_template("student.html", student=student)
+        return render_template("student.html?name={name}", student=student)
 
     return app
 
