@@ -47,8 +47,8 @@ def fetch_student_data(name):
         conn = mysql.connector.connect(**DB_CONFIG)
         cursor = conn.cursor(dictionary=True)
 
-        query = f"SELECT * FROM {TABLE_NAME} WHERE name = %s"
-        cursor.execute(query, (name,))
+        query = f"SELECT * FROM {TABLE_NAME} WHERE name = LOWER(TRIM(name))"
+        cursor.execute(query, (name.strip().lower(),))
         result = cursor.fetchone()
 
         conn.close()
