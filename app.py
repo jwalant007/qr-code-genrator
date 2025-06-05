@@ -77,11 +77,12 @@ def create_app():
                 conn = mysql.connector.connect(**DB_CONFIG)
                 cursor = conn.cursor(dictionary=True)
 
-                query = f"SELECT * FROM {TABLE_NAME} WHERE name = LOWER(TRIM(name))"
-                cursor.execute(query, (name.strip().lower(),))
+                query = f"SELECT * FROM {TABLE_NAME} WHERE name = %s"
+                cursor.execute(query, (name,))
                 result = cursor.fetchone()
                 
-              
+                print("DEBUG - name:",name)
+                print("DEBUG - DB result:",result)
                 conn.close()
                 return result if result else {}  # Returning an empty dict if no student found
             except mysql.connector.Error as err:
