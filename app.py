@@ -86,23 +86,3 @@ if __name__ == "__main__":
 
     print(f" Running Flask app on port {port} with Waitress")
     serve(app, host="0.0.0.0", port=port)
-
-
-    '''    <!DOCTYPE html>
-            <html>
-            <head>
-                <title>QR Code Display</title>
-            </head>
-            <body>
-                <h1>Generate Student QR Code</h1>
-                <form method="POST">
-                    <label for="name">Enter Student Name:</label>
-                    <input type="text" id="name" name="name" required>
-                    <button type="submit">Generate QR Code</button>
-                </form>
-                {% if qr_path %}
-                    <h2>Generated QR Code:</h2>
-                    <img src="{{ qr_path }}" alt="QR Code">
-                {% endif %}
-            </body>
-            </html>'''
