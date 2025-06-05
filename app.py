@@ -87,7 +87,7 @@ def create_app():
                 cursor.execute(query, (name.strip().lower(),))
                 result = cursor.fetchone()
         
-
+                print("debug : name",name)
                 conn.close()
                 return result if result else {}  # Returning an empty dict if no student found
             except mysql.connector.Error as err:
