@@ -4,9 +4,12 @@
         <body>
             <h1>Student Details</h1>
             {% if student %}
-        <p><strong>Name:</strong> {{ student.name }}</p>
-    {% else %}
-
+                <ul>
+                    {% for key, value in student.items() %}
+                        <li><strong>Name:</strong> {{ value }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
                 <h2>Student not found</h2>
             {% endif %}
         </body>
