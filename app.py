@@ -24,20 +24,25 @@ def test_db_connection():
         conn.close()
     except mysql.connector.Error as err:
         print(f" Connection error: {err}")
-def fetch_data():
-    try:
-        with mysql.connector.connect(**DB_CONFIG) as conn:
-            with conn.cursor(dictionary=True) as cursor:
-                query = f"SELECT * FROM '{TABLE_NAME}'"  # Using TABLE_NAME separately
-                cursor.execute(query)
-                return cursor.fetchall()
-            data = fetch_data()
-            if not data:
-             print("No records found.")
-    except mysql.connector.Error as err:
-        print(f"Error fetching data: {err}")
-        return []
 
+def fetch_student_data(name):
+            """Fetch a specific student's data by name."""
+            try:
+                conn = mysql.connector.connect(**DB_CONFIG)
+                cursor = conn.cursor(dictionary=True)
+
+                query = f"SELECT * FROM {TABLE_NAME} WHERE name = %s"
+                cursor.execute(query, (name,))
+                result = cursor.fetchone()
+                
+                print("DEBUG - name:",name)
+                print("DEBUG - DB result:",result)                
+                conn.close()
+                return result if result else {}  # Returning an empty dict if no student found
+            except mysql.connector.Error as err:
+                print(f"Error fetching student data: {err}")
+                return {}
+            
 def create_app():
     """Initialize Flask app"""
     app = Flask(__name__)
@@ -71,23 +76,6 @@ def create_app():
         student = fetch_student_data(name)
         return render_template("student.html", student=student)
 
-    def fetch_student_data(name):
-            """Fetch a specific student's data by name."""
-            try:
-                conn = mysql.connector.connect(**DB_CONFIG)
-                cursor = conn.cursor(dictionary=True)
-
-                query = f"SELECT * FROM {TABLE_NAME} WHERE name = %s"
-                cursor.execute(query, (name,))
-                result = cursor.fetchone()
-                
-                print("DEBUG - name:",name)
-                print("DEBUG - DB result:",result)
-                conn.close()
-                return result if result else {}  # Returning an empty dict if no student found
-            except mysql.connector.Error as err:
-                print(f"Error fetching student data: {err}")
-                return {}
     return app
 
 app = create_app()  
