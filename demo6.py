@@ -1,90 +1,77 @@
 import os
 import mysql.connector
 import qrcode
-from flask import Flask, render_template, request, send_file
-from waitress import serve
-from io import BytesIO
-from mysql.connector import pooling
+from flask import Flask, render_template, request
 
-# Database Configuration for Connection Pooling
+templates_dir = "templates"
+static_dir = "static"
+os.makedirs(templates_dir, exist_ok=True)
+os.makedirs(static_dir, exist_ok=True)
+
+app = Flask(__name__, template_folder=templates_dir, static_folder=static_dir)
+
 DB_CONFIG = {
-    "host": "127.0.0.1",
-    "user": "root",
-    "password": "jwalant",
+    "host": "127.0.0.1",  
+    "user": "root",  
+    "password": "Jwalant_007",  
     "database": "listdb",
-    "port": 3306
+    "auth_plugin": "mysql_native_password"
 }
 
-# Creating Connection Pool
-pool = pooling.MySQLConnectionPool(pool_name="mypool", pool_size=5, **DB_CONFIG)
+import socket
+def get_local_ip():
+    return socket.gethostbyname(socket.gethostname())
 
-def get_connection():
-    """Fetch a connection from the pool"""
-    return pool.get_connection()
+LOCAL_IP = get_local_ip()
 
-def test_db_connection():
-    """Test MySQL connection independently"""
+def get_student_data(name):
+    """Fetch student data from MySQL"""
     try:
-        conn = get_connection()
+        conn = mysql.connector.connect(**DB_CONFIG)
         cursor = conn.cursor()
-        cursor.execute("SELECT COUNT(*) FROM students")
-        count = cursor.fetchone()[0]
+        cursor.execute("SELECT * FROM students WHERE name = %s", (name,))
+        student = cursor.fetchone()
+        cursor.close()
         conn.close()
-        print(f"Database connected successfully! Students in DB: {count}")
+
+        if student:
+            return {desc: val for desc, val in zip(["Name", "sub", "marks", "total_marks", "date"], student)}
+        return None
     except mysql.connector.Error as err:
-        print(f"Connection error: {err}")
+        print(f"Database Error: {err}")
+        return None
 
-print("Connected successfully!")
+def generate_qr(name):
+    """Generate a QR code linking to the student's details page"""
+    student_data = get_student_data(name)
+    if student_data:
+        qr_url = f"http://{LOCAL_IP}:5000/student/{name}"  
 
-def create_app():
-    """Initialize Flask app"""
-    app = Flask(__name__)
-
-    @app.route("/", methods=["GET", "POST"])
-    def index():
-        qr_path = ""
-        if request.method == "POST":
-            name = request.form["name"]
-            qr_path = f"/generate_qr/{name}"
-        return render_template("index.html", qr_path=qr_path)
-
-    @app.route("/generate_qr/<name>")
-    def generate_qr(name):
-        """Generate a QR code dynamically"""
-        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/students/{name}"  
-        print(f"Generating QR for: {qr_url}")  
-
-        qr = qrcode.QRCode(version=1, box_size=10, border=5)
+        qr = qrcode.QRCode(version=None, box_size=10, border=5)
         qr.add_data(qr_url)
         qr.make(fit=True)
         img = qr.make_image(fill_color="black", back_color="white")
 
-        qr_io = BytesIO()
-        img.save(qr_io, format="PNG")
-        qr_io.seek(0)
+        img_path = os.path.join(static_dir, f"{name}_qrcode.png")
+        img.save(img_path)
 
-        return send_file(qr_io, mimetype="image/png")
+        return img_path
+    return None
 
-    @app.route("/students/<name>")
-    def show_student(name):
-        """Fetch student data from MySQL and render template"""
-        try:
-            conn = get_connection()
-            cursor = conn.cursor(dictionary=True)
-            cursor.execute("SELECT id, name, marks, total_marks FROM students WHERE name = %s", (name,))
-            student = cursor.fetchone()
-            conn.close()
+@app.route("/", methods=["GET", "POST"])
+def index():
+    qr_path = None
+    if request.method == "POST":
+        name = request.form["name"]
+        qr_path = generate_qr(name)
+    return render_template("index.html", qr_path=qr_path)
 
-            return render_template("student.html", student=student)
-        except mysql.connector.Error as err:
-            return f"Database connection error: {err}"
+@app.route("/student/<name>")
+def student_page(name):
+    student_data = get_student_data(name)
+    if student_data:
+        return render_template("student.html", student=student_data)
+    return "<h1>Student not found</h1>", 404
 
-    return app
-
-app = create_app()
-
-if __name__ == "__main__":
-    test_db_connection()
-    port = int(os.getenv("PORT", 5000))
-    print(f"Running Flask app on port {port} with Waitress")
-    serve(app, host="127.0.0.1", port=port)
+if __name__ == "_main_":
+    app.run(host="0.0.0.0", port=5000, debug=True)
