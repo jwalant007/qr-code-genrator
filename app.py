@@ -74,10 +74,7 @@ def create_app():
     def display_student(name):
         """Fetch and display a specific student's data"""
         student = fetch_student_data(name)
-        if student:
-            return render_template("student.html",name=name, student=student)
-        else:
-             return "student not found"
+        return render_template("student.html",name=name, student=student)
 
     return app
 
