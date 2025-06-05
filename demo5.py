@@ -86,11 +86,11 @@ def create_app():
 
         return send_file(qr_io, mimetype="image/png")
 
-    @app.route("/student/<name>")
+    @app.route("/student/<name>?name=<name>")
     def display_student(name):
         """Fetch and display a specific student's data"""
         student = fetch_student_data(name)
-        return render_template("student.html?name={name}", student=student)
+        return render_template("student.html?name", student=student)
 
     return app
 
