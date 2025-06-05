@@ -5,7 +5,9 @@
             <h1>Student Details</h1>
             {% if student %}
                 <ul>
-                        <li><strong>Name:</strong> {{ value }} </li>
+                    <!--{% for key, value in student.items() %}-->
+                        <li><strong>Name:</strong> {{ student.name }} </li>
+                    <!--{% endfor %}-->
                 </ul>
             {% else %}
                 <h2>Student not found</h2>
