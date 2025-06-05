@@ -51,7 +51,7 @@ def create_app():
             qr_path = f"/generate_qr/<name>"
         return render_template("index.html", qr_path=qr_path)
 
-    @app.route("/generate_qr/<name>")
+    @app.route("/generate_qr/{name}")
     def generate_qr(name):
         """Generate a QR code dynamically"""
         qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
