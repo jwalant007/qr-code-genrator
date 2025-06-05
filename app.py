@@ -5,7 +5,6 @@ from flask import Flask, render_template, request, send_file
 from waitress import serve
 from io import BytesIO
 
-# MySQL Connection Configuration (Removing table_name)
 DB_CONFIG = {
     "host": os.getenv("DB_HOST", "127.0.0.1"),
     "user": os.getenv("DB_USER", "root"),
@@ -14,7 +13,7 @@ DB_CONFIG = {
     "port": int(os.getenv("DB_PORT", 3306))
 }
 
-# Define TABLE_NAME separately
+
 TABLE_NAME = os.getenv("TABLE_NAME", "students")
 
 def test_db_connection():
@@ -100,3 +99,23 @@ if __name__ == "__main__":
 
     print(f" Running Flask app on port {port} with Waitress")
     serve(app, host="0.0.0.0", port=port)
+
+
+    '''    <!DOCTYPE html>
+            <html>
+            <head>
+                <title>QR Code Display</title>
+            </head>
+            <body>
+                <h1>Generate Student QR Code</h1>
+                <form method="POST">
+                    <label for="name">Enter Student Name:</label>
+                    <input type="text" id="name" name="name" required>
+                    <button type="submit">Generate QR Code</button>
+                </form>
+                {% if qr_path %}
+                    <h2>Generated QR Code:</h2>
+                    <img src="{{ qr_path }}" alt="QR Code">
+                {% endif %}
+            </body>
+            </html>'''
