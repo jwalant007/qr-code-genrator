@@ -5,14 +5,17 @@ from flask import Flask, render_template, request, send_file
 from waitress import serve
 from io import BytesIO
 
+# MySQL Connection Configuration (Removing table_name)
 DB_CONFIG = {
     "host": os.getenv("DB_HOST", "127.0.0.1"),
     "user": os.getenv("DB_USER", "root"),
     "password": os.getenv("DB_PASSWORD", "jwalant"),
     "database": os.getenv("DB_NAME", "listdb"),
-    "port": int(os.getenv("DB_PORT", 3306)),
-    "table_name": os.getenv("TABLE_NAME", "students")  
+    "port": int(os.getenv("DB_PORT", 3306))
 }
+
+# Define TABLE_NAME separately
+TABLE_NAME = os.getenv("TABLE_NAME", "students")
 
 def test_db_connection():
     """Test MySQL connection independently"""
@@ -24,12 +27,12 @@ def test_db_connection():
         print(f" Connection error: {err}")
 
 def fetch_data():
-    """Fetch data from the specified table."""
+    """Fetch all data from the specified table."""
     try:
         conn = mysql.connector.connect(**DB_CONFIG)
         cursor = conn.cursor(dictionary=True)
 
-        query = f"SELECT * FROM {DB_CONFIG['table_name']}"  
+        query = f"SELECT * FROM {TABLE_NAME}"  # Using TABLE_NAME separately
         cursor.execute(query)
         result = cursor.fetchall()
 
@@ -45,15 +48,15 @@ def fetch_student_data(name):
         conn = mysql.connector.connect(**DB_CONFIG)
         cursor = conn.cursor(dictionary=True)
 
-        query = f"SELECT * FROM {DB_CONFIG['table_name']} WHERE name = %s"
+        query = f"SELECT * FROM {TABLE_NAME} WHERE name = %s"
         cursor.execute(query, (name,))
         result = cursor.fetchone()
 
         conn.close()
-        return result
+        return result if result else {}  # Returning an empty dict if no student found
     except mysql.connector.Error as err:
         print(f"Error fetching student data: {err}")
-        return None
+        return {}
 
 def create_app():
     """Initialize Flask app"""
@@ -64,7 +67,7 @@ def create_app():
         qr_path = ""
         if request.method == "POST":
             name = request.form["name"]
-            qr_path = f"/generate_qr/{name}"  
+            qr_path = f"/generate_qr/{name}"
         return render_template("index.html", qr_path=qr_path)
 
     @app.route("/generate_qr/<name>")
@@ -85,7 +88,7 @@ def create_app():
     @app.route("/student/<name>")
     def display_student(name):
         """Fetch and display a specific student's data"""
-        student = fetch_student_data(name)  
+        student = fetch_student_data(name)
         return render_template("student.html", student=student)
 
     return app
