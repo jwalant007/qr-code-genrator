@@ -10,7 +10,8 @@ DB_CONFIG = {
     "user": os.getenv("DB_USER", "root"),
     "password": os.getenv("DB_PASSWORD", "jwalant"),
     "database": os.getenv("DB_NAME", "listdb"),
-    "port": int(os.getenv("DB_PORT", 3306))
+    "port": int(os.getenv("DB_PORT", 3306)),
+    "table_name": os.getenv("TABLE_NAME", "students")  # Added table name
 }
 
 def test_db_connection():
@@ -21,6 +22,22 @@ def test_db_connection():
         conn.close()
     except mysql.connector.Error as err:
         print(f" Connection error: {err}")
+
+def fetch_data():
+    """Fetch data from the specified table."""
+    try:
+        conn = mysql.connector.connect(**DB_CONFIG)
+        cursor = conn.cursor(dictionary=True)
+
+        query = f"SELECT * FROM {DB_CONFIG['students']}"
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        conn.close()
+        return result
+    except mysql.connector.Error as err:
+        print(f"Error fetching data: {err}")
+        return []
 
 def create_app():
     """Initialize Flask app"""
@@ -37,7 +54,7 @@ def create_app():
     @app.route("/generate_qr/<name>")
     def generate_qr(name):
         """Generate a QR code dynamically"""
-        qr_url = f"https://qr-code-genrator-xpcv.onrender.com//student/{name}"
+        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
         qr.add_data(qr_url)
         qr.make(fit=True)
@@ -48,6 +65,12 @@ def create_app():
         qr_io.seek(0)
 
         return send_file(qr_io, mimetype="image/png")
+
+    @app.route("/student")
+    def display_data():
+        
+        data = fetch_data()
+        return render_template("student.html", data=data)
 
     return app
 
