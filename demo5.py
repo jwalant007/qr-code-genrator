@@ -39,6 +39,22 @@ def fetch_data():
         print(f"Error fetching data: {err}")
         return []
 
+def fetch_student_data(name):
+    """Fetch a specific student's data by name."""
+    try:
+        conn = mysql.connector.connect(**DB_CONFIG)
+        cursor = conn.cursor(dictionary=True)
+
+        query = f"SELECT * FROM {DB_CONFIG['table_name']} WHERE name = %s"
+        cursor.execute(query, (name,))
+        result = cursor.fetchone()
+
+        conn.close()
+        return result
+    except mysql.connector.Error as err:
+        print(f"Error fetching student data: {err}")
+        return None
+
 def create_app():
     """Initialize Flask app"""
     app = Flask(__name__)
@@ -66,11 +82,11 @@ def create_app():
 
         return send_file(qr_io, mimetype="image/png")
 
-    @app.route("/student")
-    def display_data():
-        """Fetch and display student data"""
-        data = fetch_data()
-        return render_template("student.html", data=data)
+    @app.route("/student/<name>")
+    def display_student(name):
+        """Fetch and display a specific student's data"""
+        student = fetch_student_data(name)  
+        return render_template("student.html", student=student)
 
     return app
 
