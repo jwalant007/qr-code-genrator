@@ -8,10 +8,9 @@
 <body>
     <h1>Student Details</h1>
     {% if student %}
-    <p><strong>Name:</strong> {{ name }}</p>
-    {% else %}
-
     <h2>Student not found</h2>
+    {% else %}
+    <p><strong>Name:</strong> {{ name }}</p>
     {% endif %}
 </body>
 
