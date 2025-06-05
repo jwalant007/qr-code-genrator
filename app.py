@@ -86,8 +86,10 @@ def create_app():
                 query = f"SELECT * FROM {TABLE_NAME} WHERE name = LOWER(TRIM(name))"
                 cursor.execute(query, (name.strip().lower(),))
                 result = cursor.fetchone()
-        
-                print("debug : name",name)
+                
+                print("debug - name:", name)
+                print("debug - DB result:", result)
+
                 conn.close()
                 return result if result else {}  # Returning an empty dict if no student found
             except mysql.connector.Error as err:
