@@ -11,7 +11,7 @@ DB_CONFIG = {
     "password": os.getenv("DB_PASSWORD", "jwalant"),
     "database": os.getenv("DB_NAME", "listdb"),
     "port": int(os.getenv("DB_PORT", 3306)),
-    "table_name": os.getenv("TABLE_NAME", "students")  # Added table name
+    "table_name": os.getenv("TABLE_NAME", "students")  
 }
 
 def test_db_connection():
@@ -29,7 +29,7 @@ def fetch_data():
         conn = mysql.connector.connect(**DB_CONFIG)
         cursor = conn.cursor(dictionary=True)
 
-        query = f"SELECT * FROM {DB_CONFIG['students']}"
+        query = f"SELECT * FROM {DB_CONFIG['table_name']}"  
         cursor.execute(query)
         result = cursor.fetchall()
 
@@ -43,15 +43,15 @@ def create_app():
     """Initialize Flask app"""
     app = Flask(__name__)
 
-    @app.route("/generate_qr/<name>", methods=["GET", "POST"])
+    @app.route("/", methods=["GET", "POST"])
     def index():
         qr_path = ""
         if request.method == "POST":
             name = request.form["name"]
-            qr_path = f"/generate_qr/<name>"
+            qr_path = f"/generate_qr/{name}"  
         return render_template("index.html", qr_path=qr_path)
 
-    @app.route("/generate_qr/{name}")
+    @app.route("/generate_qr/<name>")
     def generate_qr(name):
         """Generate a QR code dynamically"""
         qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
@@ -68,7 +68,7 @@ def create_app():
 
     @app.route("/student")
     def display_data():
-        
+        """Fetch and display student data"""
         data = fetch_data()
         return render_template("student.html", data=data)
 
