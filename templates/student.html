@@ -1,18 +1,13 @@
 <!DOCTYPE html>
-<html>
-
-<head>
-    <title>Student Details</title>
-</head>
-
-<body>
-    <h1>Student Details</h1>
-    {% if student %}
-    <p><strong>Name:</strong>{{student.name}}</p>
+        <html>
+        <head><title>Student Details</title></head>
+        <body>
+            <h1>Student Details</h1>
+            {% if student %}
+        <p><strong>Name:</strong> {{ student.name }}</p>
     {% else %}
 
-    <h2>Student not found</h2>
-    {% endif %}
-</body>
-
-</html>
+                <h2>Student not found</h2>
+            {% endif %}
+        </body>
+        </html>
