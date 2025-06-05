@@ -104,7 +104,7 @@ def create_app():
 # ✅ Run App
 app = create_app()
 
-if __name__ == "_main_":
+if __name__ == "__main__":
     test_db_connection()
     port = int(os.getenv("PORT", 5000))
     print(f"🚀 Running Flask app on http://localhost:{port}")
