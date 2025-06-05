@@ -1,11 +1,11 @@
 import os
 import mysql.connector
 import qrcode
-from flask import Flask, render_template, request, send_file, redirect, url_for
+from flask import Flask, render_template, request, send_file
 from waitress import serve
 from io import BytesIO
 
-# ✅ DB Configuration
+# MySQL Connection Configuration (Removing table_name)
 DB_CONFIG = {
     "host": os.getenv("DB_HOST", "127.0.0.1"),
     "user": os.getenv("DB_USER", "root"),
@@ -14,98 +14,91 @@ DB_CONFIG = {
     "port": int(os.getenv("DB_PORT", 3306))
 }
 
+# Define TABLE_NAME separately
 TABLE_NAME = os.getenv("TABLE_NAME", "students")
 
-# ✅ Test DB Connection
 def test_db_connection():
+    """Test MySQL connection independently"""
     try:
         conn = mysql.connector.connect(**DB_CONFIG)
-        print("✅ Database connected successfully!")
+        print(" Database connected successfully!")
         conn.close()
     except mysql.connector.Error as err:
-        print(f"❌ Connection error: {err}")
+        print(f" Connection error: {err}")
 
-# ✅ Fetch all data (Optional, for listing)
 def fetch_data():
+    """Fetch all data from the specified table."""
     try:
         conn = mysql.connector.connect(**DB_CONFIG)
         cursor = conn.cursor(dictionary=True)
-        cursor.execute(f"SELECT * FROM {TABLE_NAME}")
+
+        query = f"SELECT * FROM {TABLE_NAME}"  # Using TABLE_NAME separately
+        cursor.execute(query)
         result = cursor.fetchall()
+
         conn.close()
         return result
     except mysql.connector.Error as err:
-        print(f"❌ Error fetching data: {err}")
+        print(f"Error fetching data: {err}")
         return []
 
-# ✅ Fetch specific student
 def fetch_student_data(name):
+    """Fetch a specific student's data by name."""
     try:
         conn = mysql.connector.connect(**DB_CONFIG)
         cursor = conn.cursor(dictionary=True)
-        cursor.execute(f"SELECT * FROM {TABLE_NAME} WHERE name = %s", (name,))
+
+        query = f"SELECT * FROM {TABLE_NAME} WHERE name = %s"
+        cursor.execute(query, (name,))
         result = cursor.fetchone()
+
         conn.close()
-        return result if result else {}
+        return result if result else {}  # Returning an empty dict if no student found
     except mysql.connector.Error as err:
-        print(f"❌ Error fetching student data: {err}")
+        print(f"Error fetching student data: {err}")
         return {}
 
-# ✅ Flask App Setup
 def create_app():
+    """Initialize Flask app"""
     app = Flask(__name__)
 
     @app.route("/", methods=["GET", "POST"])
     def index():
         qr_path = ""
-        student_data = {}
         if request.method == "POST":
             name = request.form["name"]
-            student_data = fetch_student_data(name)
-
-            if student_data:
-                return redirect(url_for("generate_qr", name=name))
-            else:
-                return "<h2>Student not found</h2>", 404
-
+            qr_path = f"/generate_qr/{name}"
         return render_template("index.html", qr_path=qr_path)
 
     @app.route("/generate_qr/<name>")
     def generate_qr(name):
-        """Generate QR code with embedded student data"""
-        student = fetch_student_data(name)
-        if not student:
-            return "<h2>Student not found</h2>", 404
+        """Generate a QR code dynamically"""
+        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
+        #qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student?name={name}"
+        qr = qrcode.QRCode(version=1, box_size=10, border=5)
+        qr.add_data(qr_url)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
 
-        # Embed actual data into QR code
-        data_string = (
-            f"Name: {student['name']}\n"
-            f"Subject: {student['sub']}\n"
-            f"Marks: {student['marks']}/{student['total_marks']}\n"
-            f"Date: {student['date']}"
-        )
-
-        qr = qrcode.make(data_string)
         qr_io = BytesIO()
-        qr.save(qr_io, format="PNG")
+        img.save(qr_io, format="PNG")
         qr_io.seek(0)
 
         return send_file(qr_io, mimetype="image/png")
 
     @app.route("/student/<name>")
     def display_student(name):
+        """Fetch and display a specific student's data"""
         student = fetch_student_data(name)
-        if student:
-            return render_template("student.html", student=student)
-        return "<h2>Student not found</h2>", 404
+        return render_template("student.html", student=student)
 
     return app
 
-# ✅ Run App
-app = create_app()
+app = create_app()  
 
 if __name__ == "__main__":
     test_db_connection()
     port = int(os.getenv("PORT", 5000))
-    print(f"🚀 Running Flask app on http://localhost:{port}")
+
+    print(f" Running Flask app on port {port} with Waitress")
     serve(app, host="0.0.0.0", port=port)
