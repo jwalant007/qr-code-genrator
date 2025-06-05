@@ -41,6 +41,8 @@ def test_db_connection():
         print(f"Error fetching data: {err}")
         return []'''
 
+
+
 def create_app():
     """Initialize Flask app"""
     app = Flask(__name__)
@@ -74,23 +76,22 @@ def create_app():
         """Fetch and display a specific student's data"""
         student = fetch_student_data(name)
         return render_template("student.html", student=student)
-    
+
     def fetch_student_data(name):
-        try:
-            conn = mysql.connector.connect(**DB_CONFIG)
-            cursor = conn.cursor(dictionary=True)
+            """Fetch a specific student's data by name."""
+            try:
+                conn = mysql.connector.connect(**DB_CONFIG)
+                cursor = conn.cursor(dictionary=True)
 
-            query = f"SELECT * FROM {TABLE_NAME} WHERE name = LOWER(TRIM(name))"
-            cursor.execute(query, (name.strip().lower(),))
-            result = cursor.fetchone()
+                query = f"SELECT * FROM {TABLE_NAME} WHERE name = LOWER(TRIM(name))"
+                cursor.execute(query, (name.strip().lower(),))
+                result = cursor.fetchone()
 
-            conn.close()
-            return result if result else {}  # Returning an empty dict if no student found
-        except mysql.connector.Error as err:
-            print(f"Error fetching student data: {err}")
-            return {}
-
-
+                conn.close()
+                return result if result else {}  # Returning an empty dict if no student found
+            except mysql.connector.Error as err:
+                print(f"Error fetching student data: {err}")
+                return {}
     return app
 
 app = create_app()  
