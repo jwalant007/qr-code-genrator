@@ -6,22 +6,20 @@ from flask import Flask, render_template, request, send_file
 from waitress import serve
 from io import BytesIO
 
-# ✅ Set up logging
-logging.basicConfig(level=logging.INFO)
 
-DB_CONFIG = {
+'''DB_CONFIG = {
     "host": os.getenv("DB_HOST", "127.0.0.1"),
     "user": os.getenv("DB_USER", "root"),
     "password": os.getenv("DB_PASSWORD", ""),
     "database": os.getenv("DB_NAME", "listdb"),
     "port": int(os.getenv("DB_PORT", 3306))
-}
-'''DB_CONFIG = mysql.connector.connect(
+}'''
+DB_CONFIG = mysql.connector.connect(
     host="localhost",
     user="root",
     password="",
     database="listdb"
-)'''
+)
 
 def test_db_connection():
     """✅ Test MySQL connection independently"""
@@ -39,8 +37,8 @@ def fetch_student_data(name):
         conn = mysql.connector.connect(**DB_CONFIG)
         cursor = conn.cursor(dictionary=True)
 
-        query = f"SELECT * FROM students WHERE name = %s"  # Case-insensitive search
-        cursor.execute(query, (name,))
+        #query = f""  # Case-insensitive search
+        cursor.execute(f"SELECT * FROM students WHERE name = %s", (name,))
         result = cursor.fetchone()
 
         conn.close()
