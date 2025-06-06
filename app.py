@@ -7,19 +7,19 @@ from waitress import serve
 from io import BytesIO
 
 
-'''DB_CONFIG = {
+DB_CONFIG = {
     "host": os.getenv("DB_HOST", "127.0.0.1"),
     "user": os.getenv("DB_USER", "root"),
     "password": os.getenv("DB_PASSWORD", ""),
     "database": os.getenv("DB_NAME", "listdb"),
     "port": int(os.getenv("DB_PORT", 3306))
-}'''
-DB_CONFIG = mysql.connector.connect(
+}
+'''DB_CONFIG = mysql.connector.connect(
     host="localhost",
     user="root",
     password="",
     database="listdb"
-)
+)'''
 
 def test_db_connection():
     """✅ Test MySQL connection independently"""
@@ -90,7 +90,8 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__": 
+    test_db_connection()
     port = int(os.getenv("PORT", 5000))
 
-    logging.info(f"🚀 Running Flask app on port {port} with Waitress")
-    serve(app, host="127.0.0.1", port=port)
+    print(f" Running Flask app on port {port} with Waitress")
+    serve(app, host="0.0.0.0", port=port)
