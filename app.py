@@ -22,15 +22,6 @@ DB_CONFIG = mysql.connector.connect(
     password="",
     database="listdb"
 )
-def get_db_connection():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="listdb"
-    )
-
-
 '''def test_db_connection():
     """✅ Test MySQL connection independently"""
     try:
@@ -88,7 +79,6 @@ def create_app():
 
     @app.route("/student/<name>")
     def display_student(name):
-        conn = get_db_connection()
         student = fetch_student_data(name)
         return render_template("student.html", name=name, data=data) 
 
