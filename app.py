@@ -85,7 +85,7 @@ def create_app():
         logging.info(f"Fetching student data for: {name}")  # Debugging information
         student = fetch_student_data(name)
 
-        return render_template("student.html", name=name, student=student) if student else "<h2>Student not found</h2>", 404
+        return render_template("student.html", name=name, student=student) 
 
     return app
 
