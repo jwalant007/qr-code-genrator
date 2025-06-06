@@ -16,12 +16,12 @@ logging.basicConfig(level=logging.INFO)
     "database": os.getenv("DB_NAME", "listdb"),
     "port": int(os.getenv("DB_PORT", 3306))
 }'''
-"""DB_CONFIG = mysql.connector.connect(
+DB_CONFIG = mysql.connector.connect(
     host="localhost",
     user="root",
     password="",
     database="listdb"
-)"""
+)
 def get_db_connection():
     return mysql.connector.connect(
         host="localhost",
