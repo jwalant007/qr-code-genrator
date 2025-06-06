@@ -25,22 +25,6 @@ def test_db_connection():
     except mysql.connector.Error as err:
         print(f" Connection error: {err}")
 
-def fetch_data():
-    
-    try:
-        conn = mysql.connector.connect(**DB_CONFIG)
-        cursor = conn.cursor(dictionary=True)
-
-        query = f"SELECT * FROM {TABLE_NAME}"  # Using TABLE_NAME separately
-        cursor.execute(query)
-        result = cursor.fetchall()
-
-        conn.close()
-        return result
-    except mysql.connector.Error as err:
-        print(f"Error fetching data: {err}")
-        return []
-
 def fetch_student_data(name):
             """Fetch a specific student's data by name."""
             try:
@@ -91,6 +75,24 @@ def create_app():
         """Fetch and display a specific student's data"""
         student = fetch_student_data(name)
         return render_template("student.html",name=name, student=student)
+    
+    def fetch_student_data(name):
+            """Fetch a specific student's data by name."""
+            try:
+                conn = mysql.connector.connect(**DB_CONFIG)
+                cursor = conn.cursor(dictionary=True)
+
+                query = f"SELECT * FROM {TABLE_NAME} WHERE name = %s"
+                cursor.execute(query, (name,))
+                result = cursor.fetchone()
+                
+                print("DEBUG - name:",name)
+                print("DEBUG - DB result:",result)                
+                conn.close()
+                return result if result else {}  # Returning an empty dict if no student found
+            except mysql.connector.Error as err:
+                print(f"Error fetching student data: {err}")
+                return {}
 
     return app
 
