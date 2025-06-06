@@ -16,25 +16,27 @@ logging.basicConfig(level=logging.INFO)
     "database": os.getenv("DB_NAME", "listdb"),
     "port": int(os.getenv("DB_PORT", 3306))
 }'''
-DB_CONFIG = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="",
-    database="listdb"
-)
+def get_db_connection():
+    DB_CONFIG = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="",
+        database="listdb"
+    )
+    return DB_CONFIG
 
 def fetch_student_data(name):
     """✅ Fetch a specific student's data with case-insensitive search."""
     try:
-        conn = mysql.connector.connect(**DB_CONFIG)
-        cursor = conn.cursor(dictionary=True)
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
-        query = f"SELECT * FROM students WHERE name = %s"  # Case-insensitive search
-        cursor.execute(query, (name,))
+        query = f"SELECT * FROM students WHERE name = BOB"  # Case-insensitive search
+        cursor.execute(query,(name ,))
         result = cursor.fetchone()
 
         conn.close()
-
+        cursor.close()
         return result if result else {}
 
     except mysql.connector.Error as err:
