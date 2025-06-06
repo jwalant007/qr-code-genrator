@@ -22,15 +22,6 @@ DB_CONFIG = mysql.connector.connect(
     password="",
     database="listdb"
 )
-'''def test_db_connection():
-    """✅ Test MySQL connection independently"""
-    try:
-        conn = mysql.connector.connect(**DB_CONFIG)
-        logging.info("✅ Database connected successfully!")
-        conn.close()
-    except mysql.connector.Error as err:
-        logging.error(f"❌ Connection error: {err}")
-        exit(1)  # Stops execution if DB connection fails'''
 
 def fetch_student_data(name):
     """✅ Fetch a specific student's data with case-insensitive search."""
@@ -80,7 +71,7 @@ def create_app():
     @app.route("/student/<name>")
     def display_student(name):
         student = fetch_student_data(name)
-        return render_template("student.html", name=name, data=data) 
+        return render_template("student.html", name=name, student=student) 
 
 
     return app
