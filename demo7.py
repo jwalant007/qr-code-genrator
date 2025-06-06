@@ -43,4 +43,14 @@ def index():
         " | ".join([r.col_a, r.col_b, r.col_c, r.col_d, r.col_e])
         for r in rows
     ])
+    # Create QR code
+    qr_img = qrcode.make(combined_text)
+    buffer = BytesIO()
+    qr_img.save(buffer, format="PNG")
+    buffer.seek(0)
+    img_data = buffer.read()
 
+    return Response(img_data, mimetype='image/png')
+
+if __name__ == "_main_":
+    app.run(debug=True)
