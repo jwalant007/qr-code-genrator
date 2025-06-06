@@ -52,7 +52,7 @@ def create_app():
                 conn = mysql.connector.connect(**DB_CONFIG)
                 cursor = conn.cursor(dictionary=True)
 
-                query = f"SELECT * FROM {TABLE_NAME} WHERE name = <name>"
+                query = f"SELECT * FROM {TABLE_NAME} WHERE name = {name}"
                 cursor.execute(query, (name,))
                 result = cursor.fetchone()
                 
