@@ -70,9 +70,7 @@ def create_app():
 
     @app.route("/student/<name>")
     def display_student(name):
-        student = fetch_student_data(name)
-        return render_template("student.html", name=name, student=student) 
-
+        return render_template("student.html", name=name, student=fetch_student_data(name)) 
 
     return app
 
