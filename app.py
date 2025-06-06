@@ -35,7 +35,7 @@ def fetch_student_data(name):
         conn = mysql.connector.connect(**DB_CONFIG)
         cursor = conn.cursor(dictionary=True)
 
-        query = f"SELECT * FROM {TABLE_NAME} WHERE LOWER(name) = LOWER(%s)"  # Case-insensitive search
+        query = f"SELECT * FROM {TABLE_NAME} WHERE name = %s"  # Case-insensitive search
         cursor.execute(query, (name,))
         result = cursor.fetchone()
 
