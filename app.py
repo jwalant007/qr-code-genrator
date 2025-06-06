@@ -39,7 +39,7 @@ def get_db_connection():
         conn.close()
     except mysql.connector.Error as err:
         logging.error(f"❌ Connection error: {err}")
-        exit(1)  # Stops execution if DB connection fails
+        exit(1)  # Stops execution if DB connection fails'''
 
 def fetch_student_data(name):
     """✅ Fetch a specific student's data with case-insensitive search."""
@@ -57,7 +57,7 @@ def fetch_student_data(name):
 
     except mysql.connector.Error as err:
         logging.error(f"❌ Error fetching student data: {err}")
-        return {}'''
+        return {}
 
 def create_app():
     """✅ Initialize Flask app"""
@@ -89,10 +89,7 @@ def create_app():
     @app.route("/student/<name>")
     def display_student(name):
         conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM students WHERE name = %s", (name,))
-        data = cursor.fetchall()
-        conn.close()
+        student = fetch_student_data(name)
         return render_template("student.html", name=name, data=data) 
 
 
