@@ -1,99 +1,106 @@
-from flask import Flask, render_template_string, request
-from flask_sqlalchemy import SQLAlchemy
+import os
+import mysql.connector
 import qrcode
+from flask import Flask, render_template, request, send_file
+from waitress import serve
 from io import BytesIO
-import base64
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
-db = SQLAlchemy(app)
+DB_CONFIG = {
+    "host": os.getenv("DB_HOST", "127.0.0.1"),
+    "user": os.getenv("DB_USER", "root"),
+    "password": os.getenv("DB_PASSWORD", "jwalant"),
+    "database": os.getenv("DB_NAME", "listdb"),
+    "port": int(os.getenv("DB_PORT", 3306))
+}
 
-# Define your table
-class Record(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    col_a = db.Column(db.String(100))
-    col_b = db.Column(db.String(100))
-    col_c = db.Column(db.String(100))
-    col_d = db.Column(db.String(100))
-    col_e = db.Column(db.String(100))
 
-with app.app_context():
-    db.create_all()
+TABLE_NAME = os.getenv("TABLE_NAME", "students")
 
-@app.route("/add-sample")
-def add_sample():
-    sample_data = [
-        Record(col_a="Alice", col_b="Physics", col_c="A+", col_d="Pass", col_e="2025"),
-        Record(col_a="Bob", col_b="Chemistry", col_c="B", col_d="Pass", col_e="2025"),
-        Record(col_a="Charlie", col_b="Maths", col_c="A", col_d="Pass", col_e="2025")
-    ]
-    db.session.add_all(sample_data)
-    db.session.commit()
-    return "Sample data added!"
+def test_db_connection():
+    """Test MySQL connection independently"""
+    try:
+        conn = mysql.connector.connect(**DB_CONFIG)
+        print(" Database connected successfully!")
+        conn.close()
+    except mysql.connector.Error as err:
+        print(f" Connection error: {err}")
 
-@app.route("/", methods=["GET"])
-def index():
-    query = request.args.get("search", "")
+def fetch_student_data(name):
+            """Fetch a specific student's data by name."""
+            try:
+                conn = mysql.connector.connect(**DB_CONFIG)
+                cursor = conn.cursor(dictionary=True)
 
-    if query:
-        rows = Record.query.filter(
-            (Record.col_a.contains(query)) |
-            (Record.col_b.contains(query)) |
-            (Record.col_c.contains(query)) |
-            (Record.col_d.contains(query)) |
-            (Record.col_e.contains(query))
-        ).all()
-    else:
-        rows = Record.query.limit(100).all()
+                query = f"SELECT * FROM {TABLE_NAME} WHERE name = %s"
+                cursor.execute(query, (name,))
+                result = cursor.fetchone()
+                
+                print("DEBUG - name:",name)
+                print("DEBUG - DB result:",result)                
+                conn.close()
+                return result if result else {}  # Returning an empty dict if no student found
+            except mysql.connector.Error as err:
+                print(f"Error fetching student data: {err}")
+                return {}
+            
+def create_app():
+    """Initialize Flask app"""
+    app = Flask(__name__)
 
-    combined_lines = [
-        " | ".join([
-            r.col_a or '', r.col_b or '', r.col_c or '', r.col_d or '', r.col_e or ''
-        ])
-        for r in rows
-    ]
-    combined_text = "\n".join(combined_lines)
+    @app.route("/", methods=["GET", "POST"])
+    def index():
+        qr_path = ""
+        if request.method == "POST":
+            name = request.form["name"]
+            qr_path = f"/generate_qr/{name}"
+        return render_template("index.html", qr_path=qr_path)
 
-    if not combined_text.strip():
-        return "No matching data found."
+    @app.route("/generate_qr/<name>")
+    def generate_qr(name):
+        """Generate a QR code dynamically"""
+        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
+        qr = qrcode.QRCode(version=1, box_size=10, border=5)
+        qr.add_data(qr_url)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
 
-    # Generate smaller QR code with embedded text
-    qr = qrcode.QRCode(box_size=5, border=2)
-    qr.add_data(combined_text)
-    qr.make(fit=True)
-    img = qr.make_image(fill_color="black", back_color="white")
+        qr_io = BytesIO()
+        img.save(qr_io, format="PNG")
+        qr_io.seek(0)
 
-    buffer = BytesIO()
-    img.save(buffer, format="PNG")
-    qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+        return send_file(qr_io, mimetype="image/png")
 
-    # HTML with QR only
-    html_template = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>QR Code Search</title>
-        <style>
-            body { font-family: Arial; text-align: center; margin: 20px; }
-            input[type="text"] { padding: 8px; width: 300px; }
-            button { padding: 8px 12px; }
-            img { margin-top: 20px; width: 200px; height: 200px; }
-        </style>
-    </head>
-    <body>
-        <h1>Search & Generate QR Code</h1>
-        <form method="GET">
-            <input type="text" name="search" placeholder="Search..." value="{{ search }}">
-            <button type="submit">Search</button>
-        </form>
+    @app.route("/student/<name>")
+    def display_student(name):
+        """Fetch and display a specific student's data"""
+        student = fetch_student_data(name)
+        return render_template("student.html",name=name, student=student)
+    
+    def fetch_student_data(name):
+            """Fetch a specific student's data by name."""
+            try:
+                conn = mysql.connector.connect(**DB_CONFIG)
+                cursor = conn.cursor(dictionary=True)
 
-        <img src="data:image/png;base64,{{ qr_data }}" alt="QR Code">
-        <p>Scan the QR code to view the data.</p>
-    </body>
-    </html>
-    """
+                query = f"SELECT * FROM {TABLE_NAME} WHERE name = %s"
+                cursor.execute(query, (name,))
+                result = cursor.fetchone()
+                
+                print("DEBUG - name:",name)
+                print("DEBUG - DB result:",result)                
+                conn.close()
+                return result if result else {}  # Returning an empty dict if no student found
+            except mysql.connector.Error as err:
+                print(f"Error fetching student data: {err}")
+                return {}
 
-    return render_template_string(html_template, qr_data=qr_base64, search=query)
+    return app
 
-if __name__ == "_main_":
-    app.run(debug=True)
+app = create_app()  
+
+if __name__ == "__main__":
+    test_db_connection()
+    port = int(os.getenv("PORT", 5000))
+
+    print(f" Running Flask app on port {port} with Waitress")
+    serve(app, host="0.0.0.0", port=port)
