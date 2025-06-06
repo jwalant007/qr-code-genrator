@@ -1,22 +1,17 @@
-!DOCTYPE html>  
-<html>  
-<head>  
-    <title>QR Code Search</title>  
-    <style>  
-        body { font-family: Arial; text-align: center; margin: 20px; }  
-        input[type="text"] { padding: 8px; width: 300px; }  
-        button { padding: 8px 12px; }  
-        img { margin-top: 20px; width: 200px; height: 200px; }  
-    </style>  
-</head>  
-<body>  
-    <h1>Search & Generate QR Code</h1>  
-    <form method="GET">  
-        <input type="text" name="search" placeholder="Search..." value="{{ search }}">  
-        <button type="submit">Search</button>  
-    </form>  
-
-    <img src="data:image/png;base64,{{ qr_data }}" alt="QR Code">  
-    <p>Scan the QR code to view the data.</p>  
-</body>  
-</html>  
+<html>
+    <head><title>Student Details</title></head>
+    <body>
+        <h1>Student Details</h1>
+        {% if student %}
+            <ul>
+                <li><strong>Name:</strong> {{ student.col_a }}</li>
+                <li><strong>Subject:</strong> {{ student.col_b }}</li>
+                <li><strong>Grade:</strong> {{ student.col_c }}</li>
+                <li><strong>Status:</strong> {{ student.col_d }}</li>
+                <li><strong>Year:</strong> {{ student.col_e }}</li>
+            </ul>
+        {% else %}
+            <h2>Student not found</h2>
+        {% endif %}
+    </body>
+</html>
