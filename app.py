@@ -9,21 +9,19 @@ from io import BytesIO
 # ✅ Set up logging
 logging.basicConfig(level=logging.INFO)
 
-'''DB_CONFIG = {
-    "host": os.getenv("DB_HOST", "127.0.0.1"),
-    "user": os.getenv("DB_USER", "root"),
-    "password": os.getenv("DB_PASSWORD", ""),
-    "database": os.getenv("DB_NAME", "listdb"),
-    "port": int(os.getenv("DB_PORT", 3306))
-}'''
 def get_db_connection():
-    DB_CONFIG = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="listdb"
-    )
-    return DB_CONFIG
+    try:
+        conn = mysql.connector.connect(
+            host=os.getenv("DB_HOST", "localhost"),
+            user=os.getenv("DB_USER", "root"),
+            password=os.getenv("DB_PASSWORD", ""),
+            database=os.getenv("DB_NAME", "listdb"),
+            port=int(os.getenv("DB_PORT", 3306))
+        )
+        return conn
+    except mysql.connector.Error as err:
+        logging.error(f"❌ Database connection error: {err}")
+        return None
 
 def fetch_student_data(name):
     """✅ Fetch a specific student's data with case-insensitive search."""
@@ -35,8 +33,8 @@ def fetch_student_data(name):
         cursor.execute(query,(name ,))
         result = cursor.fetchone()
 
-        conn.close()
         cursor.close()
+        conn.close()
         return result if result else {}
 
     except mysql.connector.Error as err:
