@@ -1,9 +1,13 @@
 import os
 import mysql.connector
 import qrcode
+import logging
 from flask import Flask, render_template, request, send_file
 from waitress import serve
 from io import BytesIO
+
+# ✅ Set up logging
+logging.basicConfig(level=logging.INFO)
 
 DB_CONFIG = {
     "host": os.getenv("DB_HOST", "127.0.0.1"),
@@ -13,38 +17,43 @@ DB_CONFIG = {
     "port": int(os.getenv("DB_PORT", 3306))
 }
 
-
 TABLE_NAME = os.getenv("TABLE_NAME", "students")
 
 def test_db_connection():
-    """Test MySQL connection independently"""
+    """✅ Test MySQL connection independently"""
     try:
         conn = mysql.connector.connect(**DB_CONFIG)
-        print(" Database connected successfully!")
+        logging.info("✅ Database connected successfully!")
         conn.close()
     except mysql.connector.Error as err:
-        print(f" Connection error: {err}")
+        logging.error(f"❌ Connection error: {err}")
+        exit(1)  # Stops execution if DB connection fails
 
 def fetch_student_data(name):
-            """Fetch a specific student's data by name."""
-            try:
-                conn = mysql.connector.connect(**DB_CONFIG)
-                cursor = conn.cursor(dictionary=True)
+    """✅ Fetch a specific student's data with case-insensitive search."""
+    try:
+        conn = mysql.connector.connect(**DB_CONFIG)
+        cursor = conn.cursor(dictionary=True)
 
-                query = f"SELECT * FROM {TABLE_NAME} WHERE name = %s"
-                cursor.execute(query, (name,))
-                result = cursor.fetchone()
-                
-                print("DEBUG - name:",name)
-                print("DEBUG - DB result:",result)                
-                conn.close()
-                return result if result else {}  # Returning an empty dict if no student found
-            except mysql.connector.Error as err:
-                print(f"Error fetching student data: {err}")
-                return {}
-            
+        query = f"SELECT * FROM {TABLE_NAME} WHERE LOWER(name) = LOWER(%s)"  # Case-insensitive search
+        cursor.execute(query, (name,))
+        result = cursor.fetchone()
+
+        conn.close()
+
+        if result:
+            logging.info(f"🎯 Student Data Found: {result}")
+        else:
+            logging.warning(f"⚠ No data found for student: {name}")
+
+        return result if result else {}
+
+    except mysql.connector.Error as err:
+        logging.error(f"❌ Error fetching student data: {err}")
+        return {}
+
 def create_app():
-    """Initialize Flask app"""
+    """✅ Initialize Flask app"""
     app = Flask(__name__)
 
     @app.route("/", methods=["GET", "POST"])
@@ -57,8 +66,8 @@ def create_app():
 
     @app.route("/generate_qr/<name>")
     def generate_qr(name):
-        """Generate a QR code dynamically"""
-        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
+        """✅ Generate a QR code dynamically"""
+        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"  # Fixed QR code URL
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
         qr.add_data(qr_url)
         qr.make(fit=True)
@@ -72,35 +81,19 @@ def create_app():
 
     @app.route("/student/<name>")
     def display_student(name):
-        """Fetch and display a specific student's data"""
+        """✅ Fetch and display a specific student's data"""
+        logging.info(f"Fetching student data for: {name}")  # Debugging information
         student = fetch_student_data(name)
-        return render_template("student.html",name=name, student=student)
-    
-    def fetch_student_data(name):
-            """Fetch a specific student's data by name."""
-            try:
-                conn = mysql.connector.connect(**DB_CONFIG)
-                cursor = conn.cursor(dictionary=True)
 
-                query = f"SELECT * FROM {TABLE_NAME} WHERE name = %s"
-                cursor.execute(query, (name,))
-                result = cursor.fetchone()
-                
-                print("DEBUG - name:",name)
-                print("DEBUG - DB result:",result)                
-                conn.close()
-                return result if result else {}  # Returning an empty dict if no student found
-            except mysql.connector.Error as err:
-                print(f"Error fetching student data: {err}")
-                return {}
+        return render_template("student.html", name=name, student=student) if student else "<h2>Student not found</h2>", 404
 
     return app
 
-app = create_app()  
+app = create_app()
 
 if __name__ == "__main__":
-    test_db_connection()
+    test_db_connection()  # Ensure DB is reachable before running the app
     port = int(os.getenv("PORT", 5000))
 
-    print(f" Running Flask app on port {port} with Waitress")
+    logging.info(f"🚀 Running Flask app on port {port} with Waitress")
     serve(app, host="0.0.0.0", port=port)
