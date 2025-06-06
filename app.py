@@ -22,6 +22,14 @@ DB_CONFIG = mysql.connector.connect(
     password="",
     database="listdb"
 )
+def get_db_connection():
+    return mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="",
+        database="listdb"
+    )
+
 
 '''def test_db_connection():
     """✅ Test MySQL connection independently"""
@@ -31,7 +39,7 @@ DB_CONFIG = mysql.connector.connect(
         conn.close()
     except mysql.connector.Error as err:
         logging.error(f"❌ Connection error: {err}")
-        exit(1)  # Stops execution if DB connection fails'''
+        exit(1)  # Stops execution if DB connection fails
 
 def fetch_student_data(name):
     """✅ Fetch a specific student's data with case-insensitive search."""
@@ -49,7 +57,7 @@ def fetch_student_data(name):
 
     except mysql.connector.Error as err:
         logging.error(f"❌ Error fetching student data: {err}")
-        return {}
+        return {}'''
 
 def create_app():
     """✅ Initialize Flask app"""
@@ -80,18 +88,19 @@ def create_app():
 
     @app.route("/student/<name>")
     def display_student(name):
-        student = fetch_student_data(name)
-        if student:
-            return render_template("student.html", name=name, student=student) 
-        else:
-            return "Student Not Found"
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM students WHERE name = %s", (name,))
+        data = cursor.fetchall()
+        conn.close()
+        return render_template("student.html", name=name, data=data) 
+
 
     return app
 
 app = create_app()
 
 if __name__ == "__main__":
-    test_db_connection()  # Ensure DB is reachable before running the app
     port = int(os.getenv("PORT", 5000))
 
     logging.info(f"🚀 Running Flask app on port {port} with Waitress")

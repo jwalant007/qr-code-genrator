@@ -7,7 +7,6 @@
 
 <body>
     <h1>Student Details {{ name }}</h1>
-    {% if student %}
     {% for row in data %}
     <tr>
         <td>{{ row[0] }}</td>
@@ -15,9 +14,6 @@
         <td>{{ row[2] }}</td>
     </tr>
     {% endfor %}
-    {% else %}
-    <h2>Student not found</h2>
-    {% endif %}
 </body>
 
 </html>
