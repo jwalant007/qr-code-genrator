@@ -23,7 +23,7 @@ DB_CONFIG = mysql.connector.connect(
     database="listdb"
 )
 
-def test_db_connection():
+'''def test_db_connection():
     """✅ Test MySQL connection independently"""
     try:
         conn = mysql.connector.connect(**DB_CONFIG)
@@ -31,7 +31,7 @@ def test_db_connection():
         conn.close()
     except mysql.connector.Error as err:
         logging.error(f"❌ Connection error: {err}")
-        exit(1)  # Stops execution if DB connection fails
+        exit(1)  # Stops execution if DB connection fails'''
 
 def fetch_student_data(name):
     """✅ Fetch a specific student's data with case-insensitive search."""
