@@ -22,7 +22,6 @@ DB_CONFIG = mysql.connector.connect(
     password="",
     database="listdb"
 )
-TABLE_NAME = os.getenv("TABLE_NAME", "students")
 
 def test_db_connection():
     """✅ Test MySQL connection independently"""
@@ -40,16 +39,11 @@ def fetch_student_data(name):
         conn = mysql.connector.connect(**DB_CONFIG)
         cursor = conn.cursor(dictionary=True)
 
-        query = f"SELECT * FROM {TABLE_NAME} WHERE name = %s"  # Case-insensitive search
+        query = f"SELECT * FROM students WHERE name = %s"  # Case-insensitive search
         cursor.execute(query, (name,))
         result = cursor.fetchone()
 
         conn.close()
-
-        if result:
-            logging.info(f"🎯 Student Data Found: {result}")
-        else:
-            logging.warning(f"⚠ No data found for student: {name}")
 
         return result if result else {}
 
@@ -86,11 +80,11 @@ def create_app():
 
     @app.route("/student/<name>")
     def display_student(name):
-        """✅ Fetch and display a specific student's data"""
-        logging.info(f"Fetching student data for: {name}")  # Debugging information
         student = fetch_student_data(name)
-
-        return render_template("student.html", name=name, student=student) 
+        if student:
+            return render_template("student.html", name=name, student=student) 
+        else:
+            return "Student Not Found"
 
     return app
 
