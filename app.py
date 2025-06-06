@@ -9,14 +9,19 @@ from io import BytesIO
 # ✅ Set up logging
 logging.basicConfig(level=logging.INFO)
 
-DB_CONFIG = {
+'''DB_CONFIG = {
     "host": os.getenv("DB_HOST", "127.0.0.1"),
     "user": os.getenv("DB_USER", "root"),
     "password": os.getenv("DB_PASSWORD", ""),
     "database": os.getenv("DB_NAME", "listdb"),
     "port": int(os.getenv("DB_PORT", 3306))
-}
-
+}'''
+DB_CONFIG = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="",
+    database="listdb"
+)
 TABLE_NAME = os.getenv("TABLE_NAME", "students")
 
 def test_db_connection():
