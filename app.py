@@ -25,16 +25,6 @@ def get_db_connection():
     )
     return DB_CONFIG
 
-def fetch_student_data(name):
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        query = f"SELECT * FROM students WHERE name = %s"  # Case-insensitive search
-        cursor.execute(query,(name ,))
-        result = cursor.fetchone()
-
-        conn.close()
-        cursor.close()
 
 def create_app():
     """✅ Initialize Flask app"""
@@ -65,8 +55,16 @@ def create_app():
 
     @app.route("/student/<name>")
     def display_student(name):
-        student = fetch_student_data(name)
-        return render_template("student.html", name=name, student=student) 
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        query = f"SELECT * FROM students WHERE name = %s"  # Case-insensitive search
+        cursor.execute(query,(name ,))
+        result = cursor.fetchone()
+
+        conn.close()
+        cursor.close()
+        return render_template("student.html", name=name, result=result) 
 
 
     return app
