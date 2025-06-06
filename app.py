@@ -25,6 +25,22 @@ def test_db_connection():
     except mysql.connector.Error as err:
         print(f" Connection error: {err}")
 
+def fetch_data():
+    
+    try:
+        conn = mysql.connector.connect(**DB_CONFIG)
+        cursor = conn.cursor(dictionary=True)
+
+        query = f"SELECT * FROM {TABLE_NAME}"  # Using TABLE_NAME separately
+        cursor.execute(query)
+        result = cursor.fetchall()
+
+        conn.close()
+        return result
+    except mysql.connector.Error as err:
+        print(f"Error fetching data: {err}")
+        return []
+
 def fetch_student_data(name):
             """Fetch a specific student's data by name."""
             try:
