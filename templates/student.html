@@ -1,14 +1,12 @@
 <html>
-    <head><title>Student Details</title></head>
+    <head><title>Student Details </title></head>
     <body>
-        <h1>Student Details of {{name}}</h1>
+        <h1>Student Details: {{ name }}</h1>
         {% if student %}
             <ul>
-                <li><strong>Name:</strong> {{ student.col_a }}</li>
-                <li><strong>Subject:</strong> {{ student.col_b }}</li>
-                <li><strong>Grade:</strong> {{ student.col_c }}</li>
-                <li><strong>Status:</strong> {{ student.col_d }}</li>
-                <li><strong>Year:</strong> {{ student.col_e }}</li>
+                {% for key, value in student.items() %}
+                    <p>Name :  {{ name }}</p>
+                {% endfor %}
             </ul>
         {% else %}
             <h2>Student not found</h2>
