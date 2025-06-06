@@ -3,6 +3,7 @@ import mysql.connector
 import qrcode
 from flask import Flask, render_template, request, send_file
 from waitress import serve
+import logging
 from io import BytesIO
 
 DB_CONFIG = {
@@ -86,19 +87,24 @@ def create_app():
 
         return send_file(qr_io, mimetype="image/png")
 
+def create_app():
+    """Initialize Flask app"""
+    app = Flask(__name__)
+
     @app.route("/student/<name>")
     def display_student(name):
         """Fetch and display a specific student's data"""
         student = fetch_student_data(name)
-        return render_template("student.html",name=name, student=student)
+        logging.info(f"Fetched student: {student}")  # Logs student data
+        return render_template("student.html", name=name, student=student)
 
     return app
 
-app = create_app()  
-
+logging.basicConfig(level=logging.INFO)
 if __name__ == "__main__":
+    logging.info("Testing database connection...")
     test_db_connection()
+    app=create_app
     port = int(os.getenv("PORT", 5000))
-
-    print(f" Running Flask app on port {port} with Waitress")
+    logging.info(f"Starting Flask app on port {port} with Waitress")
     serve(app, host="0.0.0.0", port=port)
