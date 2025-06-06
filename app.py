@@ -53,7 +53,7 @@ def create_app():
         if request.method == "POST":
             name = request.form["name"]
             qr_path = f"/generate_qr/{name}"
-        return render_template("index.html", qr_path=qr_path)
+        return render_template("student.py", qr_path=qr_path)
 
     @app.route("/generate_qr/<name>")
     def generate_qr(name):
