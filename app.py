@@ -77,10 +77,7 @@ def create_app():
     def display_student(name):
         test_db_connection()
         student = fetch_student_data(name)
-        if student:
-            return render_template("student.html", name=name, student=student) 
-        else:
-            return "Student Not Found"
+        return render_template("student.html", name=name, student=student) 
     return app
 
 app = create_app()
