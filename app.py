@@ -6,26 +6,39 @@ from flask import Flask, render_template, request, send_file
 from waitress import serve
 from io import BytesIO
 
+# ✅ Set up logging
+logging.basicConfig(level=logging.INFO)
 
-DB_CONFIG = {
+'''DB_CONFIG = {
     "host": os.getenv("DB_HOST", "127.0.0.1"),
     "user": os.getenv("DB_USER", "root"),
     "password": os.getenv("DB_PASSWORD", ""),
-    "database": os.getenv("DB_NAME", "listdb")
-}
-'''DB_CONFIG = mysql.connector.connect(
+    "database": os.getenv("DB_NAME", "listdb"),
+    "port": int(os.getenv("DB_PORT", 3306))
+}'''
+DB_CONFIG = mysql.connector.connect(
     host="localhost",
     user="root",
     password="",
     database="listdb"
-)'''
+)
+def get_db_connection():
+    return mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="",
+        database="listdb"
+    )
 
-def test_db_connection():
+
+'''def test_db_connection():
     """✅ Test MySQL connection independently"""
     try:
         conn = mysql.connector.connect(**DB_CONFIG)
+        logging.info("✅ Database connected successfully!")
         conn.close()
     except mysql.connector.Error as err:
+        logging.error(f"❌ Connection error: {err}")
         exit(1)  # Stops execution if DB connection fails
 
 def fetch_student_data(name):
@@ -34,8 +47,8 @@ def fetch_student_data(name):
         conn = mysql.connector.connect(**DB_CONFIG)
         cursor = conn.cursor(dictionary=True)
 
-        #query = f""  # Case-insensitive search
-        cursor.execute(f"SELECT * FROM students WHERE name = %s", (name,))
+        query = f"SELECT * FROM students WHERE name = %s"  # Case-insensitive search
+        cursor.execute(query, (name,))
         result = cursor.fetchone()
 
         conn.close()
@@ -44,7 +57,7 @@ def fetch_student_data(name):
 
     except mysql.connector.Error as err:
         logging.error(f"❌ Error fetching student data: {err}")
-        return {}
+        return {}'''
 
 def create_app():
     """✅ Initialize Flask app"""
@@ -75,14 +88,20 @@ def create_app():
 
     @app.route("/student/<name>")
     def display_student(name):
-        test_db_connection()
-        student = fetch_student_data(name)
-        return render_template("student.html", name=name, student=student) 
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM students WHERE name = %s", (name,))
+        data = cursor.fetchall()
+        conn.close()
+        return render_template("student.html", name=name, data=data) 
+
+
     return app
 
 app = create_app()
 
-if __name__ == "__main__": 
+if __name__ == "__main__":
+    port = int(os.getenv("PORT", 5000))
     app.debug = True
-    test_db_connection()
-    serve(app, host="0.0.0.0", port=5000)
+    logging.info(f"🚀 Running Flask app on port {port} with Waitress")
+    serve(app, host="127.0.0.1", port=port)
