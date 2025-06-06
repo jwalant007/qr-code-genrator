@@ -53,7 +53,7 @@ def create_app():
         if request.method == "POST":
             name = request.form["name"]
             qr_path = f"/generate_qr/{name}"
-        return render_template("student.py", qr_path=qr_path)
+        return render_template("index.html", qr_path=qr_path)
 
     @app.route("/generate_qr/<name>")
     def generate_qr(name):
@@ -74,7 +74,7 @@ def create_app():
     def display_student(name):
         """Fetch and display a specific student's data"""
         student = fetch_student_data(name)
-        return render_template("student.py",name=name, student=student)
+        return render_template("student.html",name=name, student=student)
     
     def fetch_student_data(name):
             """Fetch a specific student's data by name."""
