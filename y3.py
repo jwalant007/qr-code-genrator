@@ -11,7 +11,8 @@ DB_CONFIG = {
     "host": os.getenv("DB_HOST", "127.0.0.1"),
     "user": os.getenv("DB_USER", "root"),
     "password": os.getenv("DB_PASSWORD", ""),
-    "database": os.getenv("DB_NAME", "listdb")
+    "database": os.getenv("DB_NAME", "listdb"),
+    "port": int(os.getenv("DB_PORT", 3306))
 }
 '''DB_CONFIG = mysql.connector.connect(
     host="localhost",
@@ -24,8 +25,10 @@ def test_db_connection():
     """✅ Test MySQL connection independently"""
     try:
         conn = mysql.connector.connect(**DB_CONFIG)
+        logging.info("✅ Database connected successfully!")
         conn.close()
     except mysql.connector.Error as err:
+        logging.error(f"❌ Connection error: {err}")
         exit(1)  # Stops execution if DB connection fails
 
 def fetch_student_data(name):
