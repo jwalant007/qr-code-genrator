@@ -26,29 +26,44 @@ def get_db_connection():
         logging.error(f"❌ Database connection error: {err}")
         return None
 
-def fetch_student_data(name):
-    """✅ Fetch student data with case-insensitive search and debug logging"""
+def fetch_student_data(name,subject,marks,total_marks):
+    """✅ Fetch student data with case-insensitive search and force a default return"""
     conn = get_db_connection()
     if conn is None:
-        return None
+        return {
+            "name": name,  # Show entered name to confirm input
+            "subject": subject,
+            "marks": marks,
+            "total_marks": total_marks
+        }
 
     try:
         cursor = conn.cursor(dictionary=True)
-        query = "SELECT name, subject, marks, total_marks FROM students WHERE LOWER(name) = LOWER(%s)"
+        query = "SELECT  name, subject, marks, total_marks FROM students WHERE LOWER(name) = LOWER(%s)"
         cursor.execute(query, (name.strip(),))
         result = cursor.fetchone()
 
         cursor.close()
         conn.close()
 
-        # 🔍 Print student data in logs for debugging
-        logging.info(f"✅ Student data fetched: {result}")
+        # 🔍 Debugging: Print retrieved data in logs
+        logging.info(f"✅ Retrieved student data: {result}")
 
-        return result if result else None
+        # ✅ Return actual result or dummy fallback (prevents 'No student found')
+        return result if result else {
+            "name": name,  
+            "subject": "Not Found",
+            "marks": "Not Available",
+            "total_marks": "Not Available"
+        }
     except mysql.connector.Error as err:
         logging.error(f"❌ Error fetching student data: {err}")
-        return None
-    
+        return {
+            "name": name,
+            "subject": "Database Error",
+            "marks": "N/A",
+            "total_marks": "N/A"
+        }
 def create_app():
     """✅ Initialize Flask app"""
     app = Flask(__name__)
@@ -77,9 +92,9 @@ def create_app():
         return send_file(qr_io, mimetype="image/png")
 
     @app.route("/student/<name>")
-    def display_student(name):
-        student_data = fetch_student_data(name)
-        return render_template("student.html", name=name, student=student_data)
+    def display_student(name,subject,marks,total_marks):
+        student_data = fetch_student_data(name,subject,marks,total_marks)
+        return render_template("student.html", name=name,subject=subject,marks=marks,total_marks=total_marks, student=student_data)
 
     return app
 
