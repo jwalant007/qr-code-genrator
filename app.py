@@ -140,6 +140,7 @@ def create_app():
                 return render_template("index.html", qr_path=qr_path)
             else:
                 return "Failed to add student", 500
+        return render_template("index.html", qr_path=qr_path)
 
         
     @app.route("/generate_qr/<name>")
