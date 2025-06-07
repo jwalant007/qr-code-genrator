@@ -71,8 +71,6 @@ def fetch_student_data(name):
         cursor.execute("SELECT name, subject, marks, total_marks FROM students WHERE LOWER(name) = LOWER(%s)", (name.strip(),))
         result = cursor.fetchone()
 
-        cursor.close()
-        conn.close()
 
         logging.info(f"Retrieved student data: {result}")
 
