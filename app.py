@@ -27,30 +27,28 @@ def get_db_connection():
         return None
 
 def fetch_student_data(name):
-    """✅ Fetch student data with case-insensitive search"""
+    """✅ Fetch student data with case-insensitive search and debug logging"""
     conn = get_db_connection()
     if conn is None:
-        return {}
+        return None
 
     try:
         cursor = conn.cursor(dictionary=True)
-        query = "SELECT * FROM students WHERE LOWER(name) = LOWER(%s)"
+        query = "SELECT name, subject, marks, total_marks FROM students WHERE LOWER(name) = LOWER(%s)"
         cursor.execute(query, (name.strip(),))
         result = cursor.fetchone()
 
         cursor.close()
         conn.close()
 
-        if result:
-            logging.info(f"✅ Student data found: {result}")
-        else:
-            logging.warning("❌ No student found with provided name")
-        
-        return result if result else {}
+        # 🔍 Print student data in logs for debugging
+        logging.info(f"✅ Student data fetched: {result}")
+
+        return result if result else None
     except mysql.connector.Error as err:
         logging.error(f"❌ Error fetching student data: {err}")
-        return {}
-
+        return None
+    
 def create_app():
     """✅ Initialize Flask app"""
     app = Flask(__name__)
