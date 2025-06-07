@@ -10,6 +10,7 @@ from io import BytesIO
 logging.basicConfig(level=logging.INFO)
 
 def get_db_connection():
+    """✅ Establishes and returns a database connection"""
     try:
         conn = mysql.connector.connect(
             host=os.getenv("DB_HOST", "localhost"),
@@ -24,19 +25,20 @@ def get_db_connection():
         return None
 
 def fetch_student_data(name):
-    """✅ Fetch a specific student's data with case-insensitive search."""
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
+    """✅ Fetch student data with case-insensitive search"""
+    conn = get_db_connection()
+    if conn is None:
+        return {}
 
-        query = f"SELECT * FROM students WHERE name = %s"  # Case-insensitive search
-        cursor.execute(query,(name ,))
+    try:
+        cursor = conn.cursor(dictionary=True)
+        query = "SELECT * FROM students WHERE LOWER(name) = LOWER(%s)"
+        cursor.execute(query, (name.strip(),))
         result = cursor.fetchone()
 
         cursor.close()
         conn.close()
         return result if result else {}
-
     except mysql.connector.Error as err:
         logging.error(f"❌ Error fetching student data: {err}")
         return {}
@@ -70,7 +72,7 @@ def create_app():
 
     @app.route("/student/<name>")
     def display_student(name):
-        return render_template("student.html", name=name, student=fetch_student_data(name)) 
+        return render_template("student.html", name=name, student=fetch_student_data(name))
 
     return app
 
