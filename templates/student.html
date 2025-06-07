@@ -8,7 +8,7 @@
 <body>
     <h1>Student Details: {{ name }}</h1>
 
-    {% if student %}
+    {% if student and student.name and student.marks and student.subjects %}
         <table border="1">
             <tr>
                 <th>Name</th>
