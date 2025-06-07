@@ -26,15 +26,15 @@ def get_db_connection():
         logging.error(f"❌ Database connection error: {err}")
         return None
 
-def fetch_student_data(name,subject,marks,total_marks):
+def fetch_student_data(name):
     """✅ Fetch student data with case-insensitive search and force a default return"""
     conn = get_db_connection()
     if conn is None:
         return {
             "name": name,  # Show entered name to confirm input
-            "subject": subject,
-            "marks": marks,
-            "total_marks": total_marks
+            "subject": "Unknown",
+            "marks": 0,
+            "total_marks": 0
         }
 
     try:
@@ -92,9 +92,9 @@ def create_app():
         return send_file(qr_io, mimetype="image/png")
 
     @app.route("/student/<name>")
-    def display_student(name,subject,marks,total_marks):
-        student_data = fetch_student_data(name,"","","")
-        return render_template("student.html", name=name,subject=subject,marks=marks,total_marks=total_marks, student=student_data)
+    def display_student(name):
+        student_data = fetch_student_data(name)
+        return render_template("student.html", name=name, student=student_data)
 
     return app
 
