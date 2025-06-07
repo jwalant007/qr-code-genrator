@@ -32,7 +32,7 @@ def fetch_student_data(name):
     if conn is None:
         return {
             "name": name,  # Show entered name to confirm input
-            "subject": "Unknown",
+            "subject": "",
             "marks": 0,
             "total_marks": 0
         }
