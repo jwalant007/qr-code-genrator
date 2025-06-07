@@ -37,7 +37,7 @@ def get_db_connection():
         logging.error(f"Database connection error: {err}")
         return None
 
-def setup_database():
+'''def setup_database():
     conn = get_db_connection()
     if not conn:
         return
@@ -58,49 +58,27 @@ def setup_database():
         cursor.close()
         conn.close()    
     except mysql.connector.Error as err:
-        logging.error(f"Database setup error: {err}")
+        logging.error(f"Database setup error: {err}")'''
 
 def fetch_student_data(name):
     conn = get_db_connection()
     if not conn:
         logging.error("No database connection available")
-        return {
-            "name": name,
-            "subject": "Database Error",
-            "marks": "N/A",
-            "total_marks": "N/A"
-        }
-
-    logging.info(f"Fetching data for student: {name}")
-
+        return False
+    
     try:
-        with conn.cursor(dictionary=True) as cursor:
-            query = """
-                SELECT name, subject, marks, total_marks 
-                FROM students 
-                WHERE LOWER(name) = LOWER(%s)
-            """
-            cursor.execute(query, (name.strip(),))
-            result = cursor.fetchone()
-
+        cursor = conn.cursor()
+        cursor.execute("SELECT name, subject, marks, total_marks FROM students WHERE LOWER(name) = LOWER(%s)", (name.strip(),))
+        conn.commit()
+        cursor.close()
         conn.close()
-        logging.info(f"Retrieved student data: {result if result else 'No matching record found'}")
-
-        return result if result else {
-            "name": name,
-            "subject": "Not Found",
-            "marks": "Not Available",
-            "total_marks": "Not Available"
-        }
-
+        logging.info(f"Student '{name}' fetch successfully")
+        return True
     except mysql.connector.Error as err:
-        logging.error(f"Error fetching student data: {err}")
-        return {
-            "name": name,
-            "subject": "Database Error",
-            "marks": "N/A",
-            "total_marks": "N/A"
-        }
+        logging.error(f"Error fetch student data: {err}")
+        return False
+
+   
 
 def insert_student_data(name, subject, marks, total_marks):
     conn = get_db_connection()
