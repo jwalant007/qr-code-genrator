@@ -29,13 +29,7 @@ def get_db_connection():
 def fetch_student_data(name):
     """✅ Fetch student data with case-insensitive search and force a default return"""
     conn = get_db_connection()
-    if conn is None:
-        return {
-            "name": name,  # Show entered name to confirm input
-            "subject": "Unknown",
-            "marks": 0,
-            "total_marks": 0
-        }
+  
 
     try:
         cursor = conn.cursor(dictionary=True)
