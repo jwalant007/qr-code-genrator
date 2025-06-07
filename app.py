@@ -60,7 +60,7 @@ def get_db_connection():
     except mysql.connector.Error as err:
         logging.error(f"Database setup error: {err}")'''
 
-def fetch_student_data(name):
+def fetch_student_data(name, subject, marks, total_marks):
     conn = get_db_connection()
     if not conn:
         logging.error("No database connection available")
@@ -155,8 +155,10 @@ def create_app():
         return send_file(qr_io, mimetype="image/png")
 
     @app.route("/student/<name>")
-    def display_student(name):
-        student_data = fetch_student_data(name)
+    def display_student(name,subject, marks, total_marks):
+        student_data = fetch_student_data(name, subject, marks, total_marks)
+        if not student_data:
+            return "No student found", 404
         return render_template("student.html", student=student_data)
 
     return app
