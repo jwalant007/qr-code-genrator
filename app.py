@@ -44,7 +44,15 @@ def setup_database():
 
     try:
         cursor = conn.cursor()
-        cursor.execute()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS students (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(100),
+                subject VARCHAR(100),
+                marks INT,
+                total_marks INT
+            )
+        """)
         conn.commit()
         logging.info("Students table verified/created successfully")
         cursor.close()
