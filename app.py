@@ -99,7 +99,5 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", 5000))
     app.debug = True
-    logging.info(f"🚀 Running Flask app on port {port} with Waitress")
-    serve(app, host="0.0.0.0", port=port)
+    serve(app, host="0.0.0.0", port=5000)  # Use Waitress to serve the app
