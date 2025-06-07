@@ -62,14 +62,6 @@ def setup_database():
 
 def fetch_student_data(name):
     conn = get_db_connection()
-    if not conn:
-        logging.error("No database connection available")
-        return {
-            "name": name,
-            "subject": "Database Error",
-            "marks": "N/A",
-            "total_marks": "N/A"
-        }
     
     try:
         cursor = conn.cursor(dictionary=True)
