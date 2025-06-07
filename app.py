@@ -127,10 +127,10 @@ def create_app():
                 return "All fields are required", 400
 
             if insert_student_data(name, subject, marks, total_marks):
-                return render_template("index.html", qr_path=qr_path)
+                return render_template("index.html")
             else:
                 return "Failed to add student", 500
-        return render_template("index.html", qr_path=qr_path)
+        return render_template("index.html")
 
         
     @app.route("/generate_qr/<name>")
@@ -147,7 +147,7 @@ def create_app():
 
         return send_file(qr_io, mimetype="image/png")
 
-    @app.route(f"https://qr-code-genrator-xpcv.onrender.com/student/<name>")
+    @app.route("/student/<name>")
     def display_student(name):
         student_data = fetch_student_data(name)
         return render_template("student.html", student=student_data)
