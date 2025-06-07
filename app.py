@@ -111,7 +111,7 @@ def insert_student_data(name, subject, marks, total_marks):
     try:
         cursor = conn.cursor()
         cursor.execute("INSERT INTO students (name, subject, marks, total_marks) VALUES (%s, %s, %s, %s)", 
-                       (name, subject, int(marks), int(total_marks)))
+                       (name, subject, marks, total_marks))
         conn.commit()
         cursor.close()
         conn.close()
