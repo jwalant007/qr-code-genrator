@@ -15,7 +15,7 @@ def get_db_connection():
         conn = mysql.connector.connect(
             host=os.getenv("DB_HOST", "localhost"),
             user=os.getenv("DB_USER", "root"),
-            password=os.getenv("DB_PASSWORD", "jwalant"),
+            password=os.getenv("DB_PASSWORD", ""),
             database=os.getenv("DB_NAME", "listdb")
         )
         if conn.is_connected():
@@ -99,5 +99,7 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
+    port = int(os.getenv("PORT", 5000))
     app.debug = True
-    serve(app, host="0.0.0.0", port=5000)  # Use Waitress to serve the app
+    logging.info(f"🚀 Running Flask app on port {port} with Waitress")
+    serve(app, host="127.0.0.0", port=port)
