@@ -127,10 +127,10 @@ def create_app():
                 return "All fields are required", 400
 
             if insert_student_data(name, subject, marks, total_marks):
-                return render_template("index.html")
+                return render_template("index.html", qr_path=qr_path)
             else:
                 return "Failed to add student", 500
-        return render_template("index.html")
+        return render_template("index.html", qr_path=qr_path)
 
         
     @app.route("/generate_qr/<name>")
@@ -149,8 +149,7 @@ def create_app():
 
     @app.route("/student/<name>")
     def display_student(name):
-        student_data = fetch_student_data(name)
-        return render_template("student.html", student=student_data)
+        return render_template("student.html", student=fetch_student_data(name))
 
     return app
 
