@@ -64,19 +64,38 @@ def fetch_student_data(name):
     conn = get_db_connection()
     if not conn:
         logging.error("No database connection available")
-        return False
+        return {
+            "name": name,
+            "subject": "Database Error",
+            "marks": "N/A",
+            "total_marks": "N/A"
+        }
     
     try:
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT name, subject, marks, total_marks FROM students WHERE LOWER(name) = LOWER(%s)", (name.strip(),))
-        conn.commit()
+        result = cursor.fetchone()
+
         cursor.close()
         conn.close()
-        logging.info(f"Student '{name}' fetch successfully")
-        return True
+
+        logging.info(f"Retrieved student data: {result}")
+
+        return result if result else {
+            "name": name,
+            "subject": "Not Found",
+            "marks": "Not Available",
+            "total_marks": "Not Available"
+        }
+    
     except mysql.connector.Error as err:
-        logging.error(f"Error fetch student data: {err}")
-        return False
+        logging.error(f"Error fetching student data: {err}")
+        return {
+            "name": name,
+            "subject": "Database Error",
+            "marks": "N/A",
+            "total_marks": "N/A"
+        }
 
    
 
@@ -138,7 +157,7 @@ def create_app():
     @app.route("/student/<name>")
     def display_student(name):
         student_data = fetch_student_data(name)
-        return render_template("student.html", name=name, student=student_data)
+        return render_template("student.html", student=student_data)
 
     return app
 
