@@ -19,6 +19,8 @@ def get_db_connection():
             database=os.getenv("DB_NAME", "listdb"),
             port=int(os.getenv("DB_PORT", 3306))
         )
+        if conn.is_connected():
+            logging.info("✅ Database connection successful")
         return conn
     except mysql.connector.Error as err:
         logging.error(f"❌ Database connection error: {err}")
@@ -38,6 +40,12 @@ def fetch_student_data(name):
 
         cursor.close()
         conn.close()
+
+        if result:
+            logging.info(f"✅ Student data found: {result}")
+        else:
+            logging.warning("❌ No student found with provided name")
+        
         return result if result else {}
     except mysql.connector.Error as err:
         logging.error(f"❌ Error fetching student data: {err}")
@@ -72,7 +80,8 @@ def create_app():
 
     @app.route("/student/<name>")
     def display_student(name):
-        return render_template("student.html", name=name, student=fetch_student_data(name))
+        student_data = fetch_student_data(name)
+        return render_template("student.html", name=name, student=student_data)
 
     return app
 

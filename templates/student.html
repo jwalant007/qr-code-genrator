@@ -6,21 +6,21 @@
 </head>
 
 <body>
-    <h1>Student Details {{ Name }}</h1>
+    <h1>Student Details: {{ name }}</h1>
 
     {% if student and student.name %}
         <table border="1">
             <tr>
                 <th>Name</th>
-                <th>subject</th>
+                <th>Subject</th>
                 <th>Marks</th>
-                <th>Total_marks</th>
+                <th>Total Marks</th>
             </tr>
             <tr>
-                <td>{{ students.name }}</td>
-                <td>{{ students.subject }}</td>
-                <td>{{ students.marks }}</td>
-                <td>{{ students.total_marks }}</td>
+                <td>{{ student.name }}</td>
+                <td>{{ student.subject }}</td>
+                <td>{{ student.marks }}</td>
+                <td>{{ student.total_marks }}</td>
             </tr>
         </table>
     {% else %}
@@ -28,6 +28,5 @@
     {% endif %}
 
 </body>
-
 
 </html>
