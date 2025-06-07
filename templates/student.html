@@ -7,9 +7,18 @@
 
 <body>
     <h1>Student Details {{ name }}</h1>
-    <tr>
-        <td>{{ student.name }}</td>
-    </tr>
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Grade</th>
+        </tr>
+        <tr>
+            <td>{{ student.name }}</td>
+            <td>{{ student.age }}</td>
+            <td>{{ student.grade }}</td>
+        </tr>
+    </table>
 </body>
 
 </html>
