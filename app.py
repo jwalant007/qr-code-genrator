@@ -70,18 +70,21 @@ def fetch_student_data(name):
             "marks": "N/A",
             "total_marks": "N/A"
         }
-    else:
-        logging.info(f"Fetching data for student: {name}")
+
+    logging.info(f"Fetching data for student: {name}")
+
     try:
-        cursor = conn.cursor(dictionary=True)
-        query = "SELECT name, subject, marks, total_marks FROM students WHERE LOWER(name) = LOWER(%s)"
-        cursor.execute(query, (name.strip(),))
-        result = cursor.fetchone()
+        with conn.cursor(dictionary=True) as cursor:
+            query = """
+                SELECT name, subject, marks, total_marks 
+                FROM students 
+                WHERE LOWER(name) = LOWER(%s)
+            """
+            cursor.execute(query, (name.strip(),))
+            result = cursor.fetchone()
 
-        cursor.close()
         conn.close()
-
-        logging.info(f"Retrieved student data: {result}")
+        logging.info(f"Retrieved student data: {result if result else 'No matching record found'}")
 
         return result if result else {
             "name": name,
@@ -89,6 +92,7 @@ def fetch_student_data(name):
             "marks": "Not Available",
             "total_marks": "Not Available"
         }
+
     except mysql.connector.Error as err:
         logging.error(f"Error fetching student data: {err}")
         return {
