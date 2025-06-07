@@ -29,8 +29,14 @@ def get_db_connection():
 def fetch_student_data(name):
     """✅ Fetch student data with case-insensitive search and force a default return"""
     conn = get_db_connection()
-  
-
+    if not conn:
+        logging.error("❌ No database connection available")
+        return {
+            "name": name,
+            "subject": "Database Error",
+            "marks": "N/A",
+            "total_marks": "N/A"
+        }
     try:
         cursor = conn.cursor(dictionary=True)
         query = "SELECT  name, subject, marks, total_marks FROM students WHERE LOWER(name) = LOWER(%s)"
