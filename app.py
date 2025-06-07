@@ -134,7 +134,7 @@ def create_app():
                 return "All fields are required", 400
 
             if insert_student_data(name, subject, marks, total_marks):
-                return render_template("index.html", qr_path=qr_path)
+                return render_template("student.html", student=fetch_student_data(name))
             else:
                 return "Failed to add student", 500
         return render_template("index.html", qr_path=qr_path)
