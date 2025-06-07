@@ -139,7 +139,7 @@ def create_app():
         marks = request.form.get("marks")
         total_marks = request.form.get("total_marks")
 
-        if insert_student_data(name, subject, int(marks), int(total_marks)):
+        if insert_student_data(name, subject, marks, total_marks):
             return "Student added successfully", 200
         return "Failed to add student", 500
 
