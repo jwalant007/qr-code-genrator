@@ -75,14 +75,6 @@ def create_app():
             name = request.form["name"]
             qr_path = f"/generate_qr/{name}"
         return render_template("index.html", qr_path=qr_path)
-   
-    @app.route("/student/<name>")
-    def display_student(name,subject,marks,total_marks):
-        student_data = fetch_student_data(name,"","","")
-        return render_template("student.html", name=name,subject=subject,marks=marks,total_marks=total_marks, student=student_data)
-
-    return app
-
 
     @app.route("/generate_qr/<name>")
     def generate_qr(name):
@@ -99,7 +91,13 @@ def create_app():
 
         return send_file(qr_io, mimetype="image/png")
 
- 
+    @app.route("/student/<name>")
+    def display_student(name,subject,marks,total_marks):
+        student_data = fetch_student_data(name,"","","")
+        return render_template("student.html", name=name,subject=subject,marks=marks,total_marks=total_marks, student=student_data)
+
+    return app
+
 app = create_app()
 
 if __name__ == "__main__":
