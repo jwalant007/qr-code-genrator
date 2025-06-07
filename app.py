@@ -12,11 +12,11 @@ logging.basicConfig(level=logging.INFO)
 
 def get_db_connection():
     try:
-        db_host=os.getenv("DB_HOST", "your-render-host"),
+        db_host=os.getenv("DB_HOST", "%"),
         db_port=int(os.getenv("DB_PORT", 3306)),
-        db_password = os.getenv("DB_PASSWORD", "")
+        db_password = os.getenv("DB_PASSWORD", "root")
         db_name = os.getenv("DB_NAME", "listdb")
-        db_user = os.getenv("DB_USER", "root")
+        db_user = os.getenv("DB_USER", "remoteuser")
 
         logging.info(f"Connecting to MySQL: host={db_host}, db={db_name}")
 
