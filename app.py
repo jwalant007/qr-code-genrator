@@ -137,12 +137,9 @@ def create_app():
                 return "All fields are required", 400
 
             if insert_student_data(name, subject, marks, total_marks):
-                return f"Student '{name}' added successfully", 200
+                return render_template("index.html", qr_path=qr_path)
             else:
                 return "Failed to add student", 500
-
-
-        return render_template("index.html", qr_path=qr_path)
 
         
     @app.route("/generate_qr/<name>")
