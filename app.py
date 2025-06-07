@@ -32,7 +32,7 @@ def fetch_student_data(name):
     if conn is None:
         return {
             "name": name,  # Show entered name to confirm input
-            "subject": "",
+            "subject": "Unknown",
             "marks": 0,
             "total_marks": 0
         }
@@ -44,7 +44,6 @@ def fetch_student_data(name):
         result = cursor.fetchone()
 
         cursor.close()
-        conn.close()
 
         # 🔍 Debugging: Print retrieved data in logs
         logging.info(f"✅ Retrieved student data: {result}")
