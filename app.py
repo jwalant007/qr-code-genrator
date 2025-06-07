@@ -147,7 +147,7 @@ def create_app():
 
         return send_file(qr_io, mimetype="image/png")
 
-    @app.route("/student/<name>")
+    @app.route(f"https://qr-code-genrator-xpcv.onrender.com/student/<name>")
     def display_student(name):
         student_data = fetch_student_data(name)
         return render_template("student.html", student=student_data)
