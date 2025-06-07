@@ -56,7 +56,7 @@ def setup_database():
         conn.commit()
         logging.info("Students table verified/created successfully")
         cursor.close()
-        conn.close()
+        conn.close()    
     except mysql.connector.Error as err:
         logging.error(f"Database setup error: {err}")
 
@@ -124,15 +124,15 @@ def insert_student_data(name, subject, marks, total_marks):
 def create_app():
     app = Flask(__name__)
 
-    @app.route("/", methods=["GET", "POST"])
+    '''@app.route("/", methods=["GET", "POST"])
     def index():
         qr_path = ""
         if request.method == "POST":
             name = request.form["name"]
             qr_path = f"/generate_qr/{name}"
-        return render_template("index.html", qr_path=qr_path)
+        return render_template("index.html", qr_path=qr_path)'''
 
-    @app.route("/add_student", methods=["POST"])
+    @app.route("/", methods=["GET", "POST"])
     def add_student():
         name = request.form.get("name")
         subject = request.form.get("subject")
