@@ -129,23 +129,22 @@ def create_app():
         qr_path = ""
         if request.method == "POST":
             name = request.form["name"]
+            subject = request.form.get("subject")
+            marks = request.form.get("marks")
+            total_marks = request.form.get("total_marks")
             qr_path = f"/generate_qr/{name}"
+            if not all([name, subject, marks, total_marks]):
+                return "All fields are required", 400
+
+            if insert_student_data(name, subject, marks, total_marks):
+                return f"Student '{name}' added successfully", 200
+            else:
+                return "Failed to add student", 500
+
+
         return render_template("index.html", qr_path=qr_path)
-    @app.route("/add_student", methods=["POST"])
-    def add_student():                  
-        name = request.form.get("name")
-        subject = request.form.get("subject")
-        marks = request.form.get("marks")
-        total_marks = request.form.get("total_marks")
 
-        if not all([name, subject, marks, total_marks]):
-            return "All fields are required", 400
-
-        if insert_student_data(name, subject, marks, total_marks):
-            return f"Student '{name}' added successfully", 200
-        else:
-            return "Failed to add student", 500
-
+        
     @app.route("/generate_qr/<name>")
     def generate_qr(name):
         qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
