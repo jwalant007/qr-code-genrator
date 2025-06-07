@@ -82,6 +82,8 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
+    host = os.getenv("Host","localhost"),
+    database=os.getenv("DB", "listdb"),
     port = int(os.getenv("PORT", 5000))
     app.debug = True
     conn_test = get_db_connection()
