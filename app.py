@@ -25,45 +25,29 @@ def get_db_connection():
     except mysql.connector.Error as err:
         logging.error(f"❌ Database connection error: {err}")
         return None
+
 def fetch_student_data(name):
-    """✅ Fetch student data with case-insensitive search and force a default return"""
+    """✅ Fetch student data with case-insensitive search and debug logging"""
     conn = get_db_connection()
     if conn is None:
-        return {
-            "id": "N/A",
-            "name": name,  # Show entered name to confirm input
-            "subject": "Unknown",
-            "marks": 0,
-            "total_marks": 0
-        }
+        return None
 
     try:
         cursor = conn.cursor(dictionary=True)
-        query = "SELECT  name, subject, marks, total_marks FROM students WHERE LOWER(name) = LOWER(%s)"
+        query = "SELECT name, subject, marks, total_marks FROM students WHERE LOWER(name) = LOWER(%s)"
         cursor.execute(query, (name.strip(),))
         result = cursor.fetchone()
 
         cursor.close()
         conn.close()
 
-        # 🔍 Debugging: Print retrieved data in logs
-        logging.info(f"✅ Retrieved student data: {result}")
+        # 🔍 Print student data in logs for debugging
+        logging.info(f"✅ Student data fetched: {result}")
 
-        # ✅ Return actual result or dummy fallback (prevents 'No student found')
-        return result if result else {
-            "name": name,  
-            "subject": "Not Found",
-            "marks": "Not Available",
-            "total_marks": "Not Available"
-        }
+        return result if result else None
     except mysql.connector.Error as err:
         logging.error(f"❌ Error fetching student data: {err}")
-        return {
-            "name": name,
-            "subject": "Database Error",
-            "marks": "N/A",
-            "total_marks": "N/A"
-        }
+        return None
     
 def create_app():
     """✅ Initialize Flask app"""
