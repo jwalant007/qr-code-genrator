@@ -37,7 +37,7 @@ def get_db_connection():
         logging.error(f"Database connection error: {err}")
         return None
 
-'''def setup_database():
+def setup_database():
     conn = get_db_connection()
     if not conn:
         return
@@ -58,7 +58,7 @@ def get_db_connection():
         cursor.close()
         conn.close()    
     except mysql.connector.Error as err:
-        logging.error(f"Database setup error: {err}")'''
+        logging.error(f"Database setup error: {err}")
 
 def fetch_student_data(name):
     conn = get_db_connection()
