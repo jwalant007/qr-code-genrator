@@ -124,24 +124,27 @@ def insert_student_data(name, subject, marks, total_marks):
 def create_app():
     app = Flask(__name__)
 
-    '''@app.route("/", methods=["GET", "POST"])
+    @app.route("/", methods=["GET", "POST"])
     def index():
         qr_path = ""
         if request.method == "POST":
             name = request.form["name"]
             qr_path = f"/generate_qr/{name}"
-        return render_template("index.html", qr_path=qr_path)'''
-
-    @app.route("/", methods=["GET", "POST"])
-    def add_student():
+        return render_template("index.html", qr_path=qr_path)
+    @app.route("/add_student", methods=["POST"])
+    def add_student():                  
         name = request.form.get("name")
         subject = request.form.get("subject")
         marks = request.form.get("marks")
         total_marks = request.form.get("total_marks")
 
+        if not all([name, subject, marks, total_marks]):
+            return "All fields are required", 400
+
         if insert_student_data(name, subject, marks, total_marks):
-            return "Student added successfully", 200
-        return "Failed to add student", 500
+            return f"Student '{name}' added successfully", 200
+        else:
+            return "Failed to add student", 500
 
     @app.route("/generate_qr/<name>")
     def generate_qr(name):
