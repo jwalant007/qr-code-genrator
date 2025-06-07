@@ -15,7 +15,7 @@ def get_db_connection():
         conn = mysql.connector.connect(
             host=os.getenv("DB_HOST", "localhost"),
             user=os.getenv("DB_USER", "root"),
-            password=os.getenv("DB_PASSWORD", ""),
+            password=os.getenv("DB_PASSWORD", "jwalant"),
             database=os.getenv("DB_NAME", "listdb")
         )
         if conn.is_connected():
