@@ -75,9 +75,9 @@ def create_app():
             qr_path = f"/generate_qr/{name}"
         return render_template("index.html", qr_path=qr_path)
 
-    '''@app.route("/generate_qr/<name>")
+    @app.route("/generate_qr/<name>")
     def generate_qr(name):
-      
+     '''' 
         qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
         qr.add_data(qr_url)
