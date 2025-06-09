@@ -17,12 +17,13 @@ def get_db_connection():
     
     try:
         conn = mysql.connector.connect(
-            host=os.getenv("DB_HOST", "127.0.0.1"),
+            host=os.getenv("DB_HOST", "152.58.35.76"),
             user=os.getenv("DB_USER", "root"),
-            password=os.getenv("DB_PASSWORD", ""),
-            database=os.getenv("DB_NAME", "listdb")
-
+            password=os.getenv("DB_PASSWORD", "Jwalant_007"),
+            database=os.getenv("DB_NAME", "listdb"),
+            port=os.getenv("DB_PORT", "3306")
         )
+        print("Connected to database")
         if conn.is_connected():
             logging.info("✅ Database connection successful")
         return conn
