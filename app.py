@@ -90,7 +90,6 @@ def create_app():
 
 # ✅ Ensure Flask app is initialized correctly
 app = create_app()
-
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
     logging.info(f"🚀 Running Flask app on port {port} with Waitress")
