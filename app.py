@@ -73,10 +73,10 @@ def create_app():
 
     @app.route("/generate_qr/<name>")  
     def generate_qr(name):  
-         qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"  
-    #     qr = qrcode.QRCode(version=1, box_size=10, border=5)  
-    #     qr.add_data(qr_url)  
-    #     qr.make(fit=True)  
+          qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"  
+          qr = qrcode.QRCode(version=1, box_size=10, border=5)  
+          qr.add_data(qr_url)  
+          qr.make(fit=True)  
     #     img = qr.make_image(fill_color="black", back_color="white")  
     #     qr_io = BytesIO()  
     #     img.save(qr_io, format="PNG")  
