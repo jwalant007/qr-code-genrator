@@ -36,7 +36,7 @@ def fetch_student_data(name):
         logging.error("❌ No database connection available")
         return {
             "name": name,
-            "subject": "Database Error",
+            "subject": "g",
             "marks": "N/A",
             "total_marks": "N/A"
         }
@@ -50,7 +50,7 @@ def fetch_student_data(name):
         logging.info(f"✅ Retrieved student data: {result}")
         return result if result else {
             "name": name,
-            "subject": "Not Found",
+            "subject": "f",
             "marks": "Not Available",
             "total_marks": "Not Available"
         }
@@ -58,7 +58,7 @@ def fetch_student_data(name):
         logging.error(f"❌ Error fetching student data: {err}")
         return {
             "name": name,
-            "subject": "Database Error",
+            "subject": "e",
             "marks": "N/A",
             "total_marks": "N/A"
         }
