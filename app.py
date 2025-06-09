@@ -21,6 +21,7 @@ def get_db_connection():
             user=os.getenv("DB_USER", "root"),
             password=os.getenv("DB_PASSWORD", ""),
             database=os.getenv("DB_NAME", "listdb")
+
         )
         if conn.is_connected():
             logging.info("✅ Database connection successful")
@@ -45,7 +46,7 @@ def fetch_student_data(name):
         query = "SELECT name, subject, marks, total_marks FROM students WHERE LOWER(name) = LOWER(%s)"
         cursor.execute(query, (name.strip(),))
         result = cursor.fetchone()
-        cursor.close()
+       
 
         logging.info(f"✅ Retrieved student data: {result}")
         return result if result else {
