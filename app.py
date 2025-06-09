@@ -2,28 +2,25 @@ import os
 import mysql.connector
 import qrcode
 import logging
-import warnings  
-import dotenv  
-from flask import Flask, render_template, request, send_file, jsonify
+import warnings  # ✅ Suppress warnings globally
+from flask import Flask, render_template, request, send_file
 from waitress import serve
-from gunicorn.app.wsgiapp import run  
-from io import BytesIO  
+from io import BytesIO
 
-# ✅ Load environment variables securely
-dotenv.load_dotenv()
-
+# ✅ Suppress all warnings
 warnings.filterwarnings("ignore")
 
+# ✅ Set up logging
 logging.basicConfig(level=logging.INFO)
 
 def get_db_connection():
-    """ Establishes and returns a database connection, ensuring proper closure """
+    """✅ Establishes and returns a database connection"""
     try:
         conn = mysql.connector.connect(
-            host=os.getenv("DB_HOST"),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD"),
-            database=os.getenv("DB_NAME")
+            host=os.getenv("DB_HOST", "152.58.35.76"),
+            user=os.getenv("DB_USER", "root"),
+            password=os.getenv("DB_PASSWORD", ""),
+            database=os.getenv("DB_NAME", "listdb")
         )
         if conn.is_connected():
             logging.info("✅ Database connection successful")
@@ -37,21 +34,34 @@ def fetch_student_data(name):
     conn = get_db_connection()
     if not conn:
         logging.error("❌ No database connection available")
-        return jsonify({"error": "Database connection failed"}), 500
-
+        return {
+            "name": name,
+            "subject": "Database Error",
+            "marks": "N/A",
+            "total_marks": "N/A"
+        }
     try:
         cursor = conn.cursor(dictionary=True)
         query = "SELECT name, subject, marks, total_marks FROM students WHERE LOWER(name) = LOWER(%s)"
         cursor.execute(query, (name.strip(),))
         result = cursor.fetchone()
         cursor.close()
-        conn.close()  # ✅ Close connection to prevent leaks
 
         logging.info(f"✅ Retrieved student data: {result}")
-        return result if result else {"error": "Student not found"}
+        return result if result else {
+            "name": name,
+            "subject": "Not Found",
+            "marks": "Not Available",
+            "total_marks": "Not Available"
+        }
     except mysql.connector.Error as err:
         logging.error(f"❌ Error fetching student data: {err}")
-        return jsonify({"error": "Database query failed"}), 500
+        return {
+            "name": name,
+            "subject": "Database Error",
+            "marks": "N/A",
+            "total_marks": "N/A"
+        }
 
 def create_app():
     """✅ Initialize Flask app"""
@@ -82,14 +92,14 @@ def create_app():
 
     @app.route("/student/<name>")
     def display_student(name):
-        """✅ Improved Student Data Retrieval & Error Handling"""
         student_data = fetch_student_data(name)
-        return jsonify(student_data), (404 if "error" in student_data else 200)
+        return render_template("student.html", name=name, student=student_data)
 
     return app
 
 # ✅ Ensure Flask app is initialized correctly
 app = create_app()
+
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
     logging.info(f"🚀 Running Flask app on port {port} with Waitress")
