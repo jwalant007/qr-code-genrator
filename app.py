@@ -46,6 +46,7 @@ def fetch_student_data(name):
         }
     else:
         logging.info("Connected to database successfully")
+    
     try:
         cursor = conn.cursor(dictionary=True)
         query = "SELECT name, subject, marks, total_marks FROM students WHERE LOWER(name) = LOWER(%s)"
@@ -53,13 +54,15 @@ def fetch_student_data(name):
         result = cursor.fetchone()
         
         logging.info(f"✅ Retrieved student data: {result}")
+        cursor.close()
+        conn.close()  # ✅ Close connection after fetching data
+
         return result if result else {
             "name": name,
             "subject": "N/A",
             "marks": "Not Available",
             "total_marks": "Not Available"
         }
-
     except mysql.connector.Error as err:
         logging.error(f"❌ Error fetching student data: {err}")
         return {
@@ -68,8 +71,9 @@ def fetch_student_data(name):
             "marks": "Error",
             "total_marks": "Error"
         }
+
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, static_url_path='/static')
 
     @app.route("/", methods=["GET", "POST"])
     def index():
@@ -81,23 +85,31 @@ def create_app():
 
     @app.route("/generate_qr/<name>")
     def generate_qr(name):
-        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
+        try:
+            qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
 
-        qr = qrcode.QRCode(version=1, box_size=10, border=5)
-        qr.add_data(qr_url)
-        qr.make(fit=True)
-        img = qr.make_image(fill_color="black", back_color="white")
+            qr = qrcode.QRCode(version=1, box_size=10, border=5)
+            qr.add_data(qr_url)
+            qr.make(fit=True)
+            img = qr.make_image(fill_color="black", back_color="white")
 
-        qr_io = BytesIO()
-        img.save(qr_io, format="PNG")
-        qr_io.seek(0)
+            qr_io = BytesIO()
+            img.save(qr_io, format="PNG")
+            qr_io.seek(0)
 
-        return send_file(qr_io, mimetype="image/png")
+            return send_file(qr_io, mimetype="image/png")
+        except Exception as e:
+            logging.error(f"❌ Error generating QR code: {e}")
+            return "<h1>❌ Error generating QR code</h1>", 500
 
     @app.route("/student/<name>")
     def display_student(name):
         student_data = fetch_student_data(name)
         return render_template("student.html", name=name, student=student_data)
+
+    @app.route("/health")
+    def health_check():
+        return "<h1>🚀 Flask app is running!</h1>"
 
     return app
 
@@ -106,5 +118,5 @@ app = create_app()
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
     logging.info(f"🚀 Running Flask app on port {port} with Waitress")
-    serve(app, host="152.58.35.76", port=port)  # Updated IP
-    logging.info("FLask app is running sucessfully") 
+    serve(app, host="192.168.206.76", port=port)  # Updated IP
+    logging.info("✅ Flask app is running successfully")
