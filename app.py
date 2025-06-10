@@ -3,18 +3,14 @@ import mysql.connector
 import qrcode
 import logging
 import warnings
-from flask import Flask, render_template, request, send_file, redirect, url_for
+from flask import Flask, render_template, request, send_file
 from waitress import serve
 from io import BytesIO
 
-# ✅ Suppress warnings globally
+
 warnings.filterwarnings("ignore")
 
-# ✅ Set up logging
 logging.basicConfig(level=logging.INFO)
-
-# ✅ Create Flask app with static file serving enabled
-app = Flask(__name__, static_url_path='/static', template_folder="templates")
 
 def get_db_connection():
     try:
@@ -24,7 +20,7 @@ def get_db_connection():
             password=os.getenv("DB_PASSWORD", "Jwalant_007"),
             database=os.getenv("DB_NAME", "listdb"),
             port=int(os.getenv("DB_PORT", "3306")),
-            connect_timeout=10
+            connect_timeout=10  
         )
         
         if conn.is_connected():
@@ -36,59 +32,78 @@ def get_db_connection():
     except mysql.connector.Error as err:
         logging.error(f"❌ Database connection error: {err}")
         return None
-
-@app.route("/")
-def index():
-    try:
-        # ✅ Test database connection before rendering the template
-        conn = get_db_connection()
-        if not conn:
-            return "<h1>❌ Database connection failed</h1>", 500
-        conn.close()  # ✅ Close connection after check
-        return render_template("index.html")
-    except Exception as e:
-        logging.error(f"❌ Exception occurred: {str(e)}")
-        return f"<h1>❌ Internal Server Error</h1><p>{str(e)}</p>", 500
-
-@app.route("/health")
-def health_check():
-    return "<h1>🚀 Flask app is running!</h1>"
-
-def insert_student_data(name, subject, marks, total_marks):
+    
+def fetch_student_data(name):
     conn = get_db_connection()
     if not conn:
         logging.error("❌ No database connection available")
-        return False
-
+        return {
+            "name": name,
+            "subject": "N/A",
+            "marks": "N/A",
+            "total_marks": "N/A"
+        }
+    else:
+        logging.info("Connected to database successfully")
     try:
-        cursor = conn.cursor()
-        query = "INSERT INTO students (name, subject, marks, total_marks) VALUES (%s, %s, %s, %s)"
-        cursor.execute(query, (name, subject, marks, total_marks))
-        conn.commit()
-        cursor.close()
-        conn.close()  # ✅ Ensuring the connection is properly closed
-        logging.info(f"✅ Successfully inserted student data: {name}")
-        return True
+        cursor = conn.cursor(dictionary=True)
+        query = "SELECT name, subject, marks, total_marks FROM students WHERE LOWER(name) = LOWER(%s)"
+        cursor.execute(query, (name.strip(),))
+        result = cursor.fetchone()
+        
+        logging.info(f"✅ Retrieved student data: {result}")
+        return result if result else {
+            "name": name,
+            "subject": "N/A",
+            "marks": "Not Available",
+            "total_marks": "Not Available"
+        }
+
     except mysql.connector.Error as err:
-        logging.error(f"❌ Error inserting student data: {err}")
-        return False
+        logging.error(f"❌ Error fetching student data: {err}")
+        return {
+            "name": name,
+            "subject": "N/A",
+            "marks": "Error",
+            "total_marks": "Error"
+        }
+def create_app():
+    app = Flask(__name__)
 
-@app.route("/add_student", methods=["GET", "POST"])
-def add_student():
-    if request.method == "POST":
-        name = request.form["name"]
-        subject = request.form["subject"]
-        marks = request.form["marks"]
-        total_marks = request.form["total_marks"]
+    @app.route("/", methods=["GET", "POST"])
+    def index():
+        qr_path = ""
+        if request.method == "POST":
+            name = request.form["name"]
+            qr_path = f"/generate_qr/{name}"
+        return render_template("index.html", qr_path=qr_path)
 
-        success = insert_student_data(name, subject, marks, total_marks)
-        if success:
-            return redirect(url_for("index"))  # ✅ Redirect to home after successful insert
+    @app.route("/generate_qr/<name>")
+    def generate_qr(name):
+        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
 
-    return render_template("add_student.html", success=None)
+        qr = qrcode.QRCode(version=1, box_size=10, border=5)
+        qr.add_data(qr_url)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+
+        qr_io = BytesIO()
+        img.save(qr_io, format="PNG")
+        qr_io.seek(0)
+
+        return send_file(qr_io, mimetype="image/png")
+
+    @app.route("/student/<name>")
+    def display_student(name):
+        student_data = fetch_student_data(name)
+        return render_template("student.html", name=name, student=student_data)
+
+    return app
+
+app = create_app()
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
     logging.info(f"🚀 Running Flask app on port {port} with Waitress")
-    app.run(debug=True)  # ✅ Enabled Debug Mode for error visibility
-    serve(app, host="192.168.206.76", port=port)
+    serve(app, host="192.168.206.76", port=port)  # Updated IP
+    logging.info("FLask app is running sucessfully") 
