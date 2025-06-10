@@ -25,6 +25,26 @@
         background-color: #000000;
     }
 </style>
+<script>
+   function validateForm() {
+            let name = document.forms["studentForm"]["name"].value;
+            let subject = document.forms["studentForm"]["subject"].value;
+            let marks = document.forms["studentForm"]["marks"].value;
+            let totalMarks = document.forms["studentForm"]["total_marks"].value;
+
+            if (name === "" || subject === "" || marks === "" || totalMarks === "") {
+                alert("❌ All fields must be filled out!");
+                return false;
+            }
+
+            if (isNaN(marks) || isNaN(totalMarks)) {
+                alert("❌ Marks and Total Marks must be numbers!");
+                return false;
+            }
+
+            return confirm("Are you sure you want to submit the data?");
+        }
+    </script>
         </head>
         <body>
             <nav>
@@ -33,15 +53,21 @@
             </nav>
     <div class="container">
             <center><h1>Generate Student QR Code</h1></center>
-            <form method="POST">
-                <label for="name">Enter Student Name:</label><br
-                <input type="text" id="name" name="name" required>
-                <label for="name">Enter Subject Name:</label><br
-                <input type="text" id="subject" name="subject" required>
-                <label for="name">Enter Marks:</label><br>
-                <input type="number" id="marks" name="marks" required>
-                <button type="submit">Generate QR Code</button><br
-            </form>
+           <form name="studentForm" method="POST" onsubmit="return validateForm()">
+            <label>Name:</label><br>
+            <input type="text" name="name" required autofocus><br><br>
+
+            <label>Subject:</label><br>
+            <input type="text" name="subject" required><br><br>
+
+            <label>Marks:</label><br>
+            <input type="number" name="marks" required><br><br>
+
+            <label>Total Marks:</label><br>
+            <input type="number" name="total_marks" required><br><br>
+
+            <button type="submit">Add Student</button>
+        </form>
             {% if qr_path %}
                 <h2>Generated QR Code:</h2>
                 <img src="{{ qr_path }}" alt="QR Code">
