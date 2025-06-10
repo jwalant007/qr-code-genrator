@@ -6,57 +6,71 @@ import warnings
 from flask import Flask, render_template, request, send_file, redirect, url_for
 from waitress import serve
 from io import BytesIO
+from dotenv import load_dotenv
+from flask_caching import Cache
+
+# ✅ Load environment variables
+load_dotenv()
 
 # ✅ Suppress warnings globally
 warnings.filterwarnings("ignore")
 
 # ✅ Set up logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
+# ✅ Initialize Flask App
+app = Flask(__name__)
+
+# ✅ Configure Cache (Simple in-memory)
+cache = Cache(app, config={"CACHE_TYPE": "SimpleCache", "CACHE_DEFAULT_TIMEOUT": 300})
+
 
 def get_db_connection():
+    """Establish a pooled database connection."""
     try:
         conn = mysql.connector.connect(
-            host=os.getenv("DB_HOST", "192.168.206.76"),
+            host=os.getenv("DB_HOST", "localhost"),
             user=os.getenv("DB_USER", "root"),
-            password=os.getenv("DB_PASSWORD", "Jwalant_007"),
+            password=os.getenv("DB_PASSWORD", ""),
             database=os.getenv("DB_NAME", "listdb"),
             port=int(os.getenv("DB_PORT", "3306")),
-            connect_timeout=10
+            pool_name="mypool",
+            pool_size=5
         )
-        
-        if conn.is_connected():
-            logging.info("✅ Database connection successful")
-            return conn
-        else:
-            logging.error("❌ Connection failed")
-            return None
+        logging.info("✅ Database connection successful")
+        return conn
     except mysql.connector.Error as err:
         logging.error(f"❌ Database connection error: {err}")
         return None
 
+
 def insert_student_data(name, subject, marks, total_marks):
+    """Insert student data into the database."""
     conn = get_db_connection()
     if not conn:
-        logging.error("❌ No database connection available")
         return False
-
+    
     try:
         cursor = conn.cursor()
         query = "INSERT INTO students (name, subject, marks, total_marks) VALUES (%s, %s, %s, %s)"
         cursor.execute(query, (name, subject, marks, total_marks))
         conn.commit()
-        cursor.close()
-        conn.close()  # ✅ Close connection after insertion
-        logging.info(f"✅ Successfully inserted student data: {name}")
+        logging.info(f"✅ Successfully inserted student: {name}")
+        cache.delete(f"student_{name.lower()}")  # ✅ Invalidate cache
         return True
     except mysql.connector.Error as err:
         logging.error(f"❌ Error inserting student data: {err}")
         return False
+    finally:
+        cursor.close()
+        conn.close()
 
+
+@cache.memoize(300)
 def fetch_student_data(name):
+    """Fetch student data with caching to reduce database queries."""
     conn = get_db_connection()
     if not conn:
-        logging.error("❌ No database connection available")
         return {"name": name, "subject": "N/A", "marks": "N/A", "total_marks": "N/A"}
 
     try:
@@ -64,67 +78,70 @@ def fetch_student_data(name):
         query = "SELECT name, subject, marks, total_marks FROM students WHERE LOWER(name) = LOWER(%s)"
         cursor.execute(query, (name.strip(),))
         result = cursor.fetchone()
-        cursor.close()
-        conn.close()  # ✅ Close connection after fetching data
-
-        logging.info(f"✅ Retrieved student data: {result}")
-        return result if result else {"name": name, "subject": "N/A", "marks": "Not Available", "total_marks": "Not Available"}
+        return result or {"name": name, "subject": "N/A", "marks": "Not Available", "total_marks": "Not Available"}
     except mysql.connector.Error as err:
         logging.error(f"❌ Error fetching student data: {err}")
         return {"name": name, "subject": "N/A", "marks": "Error", "total_marks": "Error"}
+    finally:
+        cursor.close()
+        conn.close()
 
-def create_app():
-    app = Flask(__name__, static_url_path='/static')
 
-    @app.route("/", methods=["GET", "POST"])
-    def index():
-        qr_path = ""
-        if request.method == "POST":
-            name = request.form["name"]
-            qr_path = f"/generate_qr/{name}"
-        return render_template("index.html", qr_path=qr_path)
+def generate_qr_code(url):
+    """Generate a QR Code for a given URL."""
+    qr = qrcode.QRCode(version=1, box_size=10, border=5)
+    qr.add_data(url)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    qr_io = BytesIO()
+    img.save(qr_io, format="PNG")
+    qr_io.seek(0)
+    return qr_io
 
-    @app.route("/generate_qr/<name>")
-    def generate_qr(name):
-        try:
-            qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
 
-            qr = qrcode.QRCode(version=1, box_size=10, border=5)
-            qr.add_data(qr_url)
-            qr.make(fit=True)
-            img = qr.make_image(fill_color="black", back_color="white")
+@app.route("/", methods=["GET", "POST"])
+def index():
+    """Homepage with QR generation support."""
+    qr_path = ""
+    if request.method == "POST":
+        name = request.form["name"]
+        qr_path = f"/generate_qr/{name}"
+    return render_template("index.html", qr_path=qr_path)
 
-            qr_io = BytesIO()
-            img.save(qr_io, format="PNG")
-            qr_io.seek(0)
 
-            return send_file(qr_io, mimetype="image/png")
-        except Exception as e:
-            logging.error(f"❌ Error generating QR code: {e}")
-            return "<h1>❌ Error generating QR code</h1>", 500
+@app.route("/generate_qr/<name>")
+def generate_qr(name):
+    """Generate a QR code dynamically."""
+    try:
+        qr_url = f"https://example.com/student/{name}"
+        qr_io = generate_qr_code(qr_url)
+        return send_file(qr_io, mimetype="image/png")
+    except Exception as e:
+        logging.error(f"❌ Error generating QR code: {e}")
+        return "<h1>❌ Error generating QR code</h1>", 500
 
-    @app.route("/student/<name>")
-    def display_student(name):
-        student_data = fetch_student_data(name)
-        return render_template("student.html", name=name, student=student_data)
 
-    @app.route("/add_student", methods=["GET", "POST"])
-    def add_student():
-        success = None
-        if request.method == "POST":
-            name = request.form["name"]
-            subject = request.form["subject"]
-            marks = request.form["marks"]
-            total_marks = request.form["total_marks"]
-            success = insert_student_data(name, subject, marks, total_marks)
-            if success:
-                return redirect(url_for("index"))  # ✅ Redirect to home if insert succeeds
+@app.route("/student/<name>")
+def display_student(name):
+    """Retrieve and display student details."""
+    student_data = fetch_student_data(name)
+    return render_template("student.html", name=name, student=student_data)
 
-        return render_template("add-student.html", success=success)  
 
-    return app
+@app.route("/add_student", methods=["GET", "POST"])
+def add_student():
+    """Form to add new students."""
+    success = None
+    if request.method == "POST":
+        name = request.form["name"]
+        subject = request.form["subject"]
+        marks = request.form["marks"]
+        total_marks = request.form["total_marks"]
+        success = insert_student_data(name, subject, marks, total_marks)
+        if success:
+            return redirect(url_for("index"))
+    return render_template("add-student.html", success=success)
 
-app = create_app()
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
