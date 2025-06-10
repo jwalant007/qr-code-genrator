@@ -9,21 +9,22 @@
                    <a href="/">🏠 Home</a> |
                    <a href="/add_student">➕ Add Student</a> |
                 </nav>
-
-                <h1>Generate Student QR Code</h1>
+        <div class="container">
+                <center><h1>Generate Student QR Code</h1></center>
                 <form method="POST">
-                    <label for="name">Enter Student Name:</label>
+                    <label for="name">Enter Student Name:</label><br
                     <input type="text" id="name" name="name" required>
-                    <label for="name">Enter Subject Name:</label>
+                    <label for="name">Enter Subject Name:</label><br
                     <input type="text" id="subject" name="subject" required>
-                    <label for="name">Enter Marks:</label>
+                    <label for="name">Enter Marks:</label><br>
                     <input type="number" id="marks" name="marks" required>
-                    <button type="submit">Generate QR Code</button>
+                    <button type="submit">Generate QR Code</button><br
                 </form>
                 {% if qr_path %}
                     <h2>Generated QR Code:</h2>
                     <img src="{{ qr_path }}" alt="QR Code">
                 {% endif %}
+        </div>
             </body>
             </html>
             
