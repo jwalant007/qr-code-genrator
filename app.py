@@ -21,7 +21,7 @@ def get_db_connection():
             password=os.getenv("DB_PASSWORD", "Jwalant_007"),
             database=os.getenv("DB_NAME", "listdb"),
             port=int(os.getenv("DB_PORT", "3306")),
-            connect_timeout=10  # Set timeout to prevent hanging connections
+            connect_timeout=10
         )
         
         if conn.is_connected():
@@ -55,7 +55,6 @@ def insert_student_data(name, subject, marks, total_marks):
 
 def fetch_student_data(name):
     conn = get_db_connection()
-    print(conn.is_connected())
     if not conn:
         logging.error("❌ No database connection available")
         return {"name": name, "subject": "N/A", "marks": "N/A", "total_marks": "N/A"}
@@ -79,7 +78,6 @@ def create_app():
 
     @app.route("/", methods=["GET", "POST"])
     def index():
-
         qr_path = ""
         if request.method == "POST":
             name = request.form["name"]
@@ -122,11 +120,7 @@ def create_app():
             if success:
                 return redirect(url_for("index"))  # ✅ Redirect to home if insert succeeds
 
-        return render_template("add-student.html", success=success)
-
-    @app.route("/health")
-    def health_check():
-        return "<h1>🚀 Flask app is running!</h1>"
+        return render_template("add-student.html", success=success)  
 
     return app
 
@@ -137,4 +131,3 @@ if __name__ == "__main__":
     logging.info(f"🚀 Running Flask app on port {port} with Waitress")
     serve(app, host="192.168.206.76", port=port)
     logging.info("✅ Flask app is running successfully")
-    app.run(debug=True)
