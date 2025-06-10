@@ -3,7 +3,7 @@ import mysql.connector
 import qrcode
 import logging
 import warnings
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, redirect, url_for
 from waitress import serve
 from io import BytesIO
 
@@ -33,44 +33,45 @@ def get_db_connection():
     except mysql.connector.Error as err:
         logging.error(f"❌ Database connection error: {err}")
         return None
-    
+
+def insert_student_data(name, subject, marks, total_marks):
+    conn = get_db_connection()
+    if not conn:
+        logging.error("❌ No database connection available")
+        return False
+
+    try:
+        cursor = conn.cursor()
+        query = "INSERT INTO students (name, subject, marks, total_marks) VALUES (%s, %s, %s, %s)"
+        cursor.execute(query, (name, subject, marks, total_marks))
+        conn.commit()
+        cursor.close()
+        conn.close()  # ✅ Close connection after insertion
+        logging.info(f"✅ Successfully inserted student data: {name}")
+        return True
+    except mysql.connector.Error as err:
+        logging.error(f"❌ Error inserting student data: {err}")
+        return False
+
 def fetch_student_data(name):
     conn = get_db_connection()
     if not conn:
         logging.error("❌ No database connection available")
-        return {
-            "name": name,
-            "subject": "N/A",
-            "marks": "N/A",
-            "total_marks": "N/A"
-        }
-    else:
-        logging.info("Connected to database successfully")
-    
+        return {"name": name, "subject": "N/A", "marks": "N/A", "total_marks": "N/A"}
+
     try:
         cursor = conn.cursor(dictionary=True)
         query = "SELECT name, subject, marks, total_marks FROM students WHERE LOWER(name) = LOWER(%s)"
         cursor.execute(query, (name.strip(),))
         result = cursor.fetchone()
-        
-        logging.info(f"✅ Retrieved student data: {result}")
         cursor.close()
         conn.close()  # ✅ Close connection after fetching data
 
-        return result if result else {
-            "name": name,
-            "subject": "N/A",
-            "marks": "Not Available",
-            "total_marks": "Not Available"
-        }
+        logging.info(f"✅ Retrieved student data: {result}")
+        return result if result else {"name": name, "subject": "N/A", "marks": "Not Available", "total_marks": "Not Available"}
     except mysql.connector.Error as err:
         logging.error(f"❌ Error fetching student data: {err}")
-        return {
-            "name": name,
-            "subject": "N/A",
-            "marks": "Error",
-            "total_marks": "Error"
-        }
+        return {"name": name, "subject": "N/A", "marks": "Error", "total_marks": "Error"}
 
 def create_app():
     app = Flask(__name__, static_url_path='/static')
@@ -107,6 +108,20 @@ def create_app():
         student_data = fetch_student_data(name)
         return render_template("student.html", name=name, student=student_data)
 
+    @app.route("/add_student", methods=["GET", "POST"])
+    def add_student():
+        success = None
+        if request.method == "POST":
+            name = request.form["name"]
+            subject = request.form["subject"]
+            marks = request.form["marks"]
+            total_marks = request.form["total_marks"]
+            success = insert_student_data(name, subject, marks, total_marks)
+            if success:
+                return redirect(url_for("index"))  # ✅ Redirect to home if insert succeeds
+
+        return render_template("add_student.html", success=success)
+
     @app.route("/health")
     def health_check():
         return "<h1>🚀 Flask app is running!</h1>"
@@ -118,5 +133,5 @@ app = create_app()
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
     logging.info(f"🚀 Running Flask app on port {port} with Waitress")
-    serve(app, host="192.168.206.76", port=port)  # Updated IP
+    serve(app, host="192.168.206.76", port=port)
     logging.info("✅ Flask app is running successfully")
