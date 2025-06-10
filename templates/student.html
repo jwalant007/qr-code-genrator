@@ -2,27 +2,47 @@
 <html>
 <head>
     <title>Marksheet</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f8f9fa;
+        }
         table {
-            width: 50%;
+            width: 60%;
             border-collapse: collapse;
             margin: 20px auto;
-            text-align: center;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            background: white;
         }
         th, td {
             border: 1px solid black;
-            padding: 10px;
+            padding: 12px;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #007bff;
+            color: white;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
         }
     </style>
 </head>
 <body>
 
-    <h2 style="text-align: center;">Student Marksheet</h2>
+    <h2>Student Marksheet</h2>
     
-    <table>
+    <table id="marksheet">
         <tr>
             <th>Name</th>
             <th>Subject</th>
@@ -48,6 +68,18 @@
             <td>100</td>
         </tr>
     </table>
+
+    <button onclick="downloadPDF()">Download as PDF</button>
+
+    <script>
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            let doc = new jsPDF();
+            doc.text("Student Marksheet", 20, 20);
+            doc.autoTable({ html: '#marksheet' });
+            doc.save("marksheet.pdf");
+        }
+    </script>
 
 </body>
 </html>
