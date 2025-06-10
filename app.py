@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.INFO)
 def get_db_connection():
     try:
         conn = mysql.connector.connect(
-            host=os.getenv("DB_HOST", "152.58.35.76"),
+            host=os.getenv("DB_HOST", "192.168.206.210"),
             user=os.getenv("DB_USER", "root"),
             password=os.getenv("DB_PASSWORD", "Jwalant_007"),
             database=os.getenv("DB_NAME", "listdb"),
@@ -106,5 +106,5 @@ app = create_app()
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
     logging.info(f"🚀 Running Flask app on port {port} with Waitress")
-    serve(app, host="152.58.35.76", port=port)  # Updated IP
+    serve(app, host="192.168.206.210", port=port)  # Updated IP
     logging.info("FLask app is running sucessfully") 
