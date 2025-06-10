@@ -116,7 +116,7 @@ def index():
 def generate_qr(name):
     """Generate a QR code dynamically."""
     try:
-        qr_url = f"https://example.com/student/{name}"
+        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
         qr_io = generate_qr_code(qr_url)
         return send_file(qr_io, mimetype="image/png")
     except Exception as e:
