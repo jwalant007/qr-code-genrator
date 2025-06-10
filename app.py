@@ -7,21 +7,20 @@ from flask import Flask, render_template, request, send_file
 from waitress import serve
 from io import BytesIO
 
-# ✅ Suppress warnings globally
+
 warnings.filterwarnings("ignore")
 
-# ✅ Set up logging
 logging.basicConfig(level=logging.INFO)
 
 def get_db_connection():
     try:
         conn = mysql.connector.connect(
-            host=os.getenv("DB_HOST", "192.168.206.210"),
+            host=os.getenv("DB_HOST", "192.168.206.76"),
             user=os.getenv("DB_USER", "root"),
             password=os.getenv("DB_PASSWORD", "Jwalant_007"),
             database=os.getenv("DB_NAME", "listdb"),
             port=int(os.getenv("DB_PORT", "3306")),
-            connect_timeout=10  # Set timeout to prevent hanging connections
+            connect_timeout=10  
         )
         
         if conn.is_connected():
@@ -106,5 +105,5 @@ app = create_app()
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
     logging.info(f"🚀 Running Flask app on port {port} with Waitress")
-    serve(app, host="192.168.206.210", port=port)  # Updated IP
+    serve(app, host="192.168.206.76", port=port)  # Updated IP
     logging.info("FLask app is running sucessfully") 
