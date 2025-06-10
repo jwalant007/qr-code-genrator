@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Add Student</title>
+    <script>
+        function validateForm() {
+            let name = document.forms["studentForm"]["name"].value;
+            let subject = document.forms["studentForm"]["subject"].value;
+            let marks = document.forms["studentForm"]["marks"].value;
+            let totalMarks = document.forms["studentForm"]["total_marks"].value;
+
+            if (name === "" || subject === "" || marks === "" || totalMarks === "") {
+                alert("❌ All fields must be filled out!");
+                return false;
+            }
+
+            if (isNaN(marks) || isNaN(totalMarks)) {
+                alert("❌ Marks and Total Marks must be numbers!");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</head>
+<body>
+    <nav>
+        <a href="/">🏠 Home</a> |
+        <a href="/add_student">➕ Add Student</a> |
+        <a href="/student/sample_name">🔍 View Student</a>
+    </nav>
+
+    <h2>Add New Student</h2>
+    {% if success is not none %}
+        <p>
+            {% if success %}
+                ✅ Student data inserted successfully!
+            {% else %}
+                ❌ Error inserting student data.
+            {% endif %}
+        </p>
+    {% endif %}
+
+    <form name="studentForm" method="POST" onsubmit="return validateForm()">
+        <label>Name:</label><br>
+        <input type="text" name="name" required><br><br>
+
+        <label>Subject:</label><br>
+        <input type="text" name="subject" required><br><br>
+
+        <label>Marks:</label><br>
+        <input type="number" name="marks" required><br><br>
+
+        <label>Total Marks:</label><br>
+        <input type="number" name="total_marks" required><br><br>
+
+        <button type="submit">Add Student</button>
+    </form>
+</body>
+</html>

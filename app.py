@@ -3,13 +3,14 @@ import mysql.connector
 import qrcode
 import logging
 import warnings
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, redirect, url_for
 from waitress import serve
 from io import BytesIO
 
-
+# ✅ Suppress warnings globally
 warnings.filterwarnings("ignore")
 
+# ✅ Set up logging
 logging.basicConfig(level=logging.INFO)
 
 def get_db_connection():
@@ -20,7 +21,7 @@ def get_db_connection():
             password=os.getenv("DB_PASSWORD", "Jwalant_007"),
             database=os.getenv("DB_NAME", "listdb"),
             port=int(os.getenv("DB_PORT", "3306")),
-            connect_timeout=10  
+            connect_timeout=10
         )
         
         if conn.is_connected():
@@ -52,6 +53,8 @@ def fetch_student_data(name):
         result = cursor.fetchone()
         
         logging.info(f"✅ Retrieved student data: {result}")
+        conn.close()  # ✅ Close connection after fetching data
+
         return result if result else {
             "name": name,
             "subject": "N/A",
@@ -67,6 +70,27 @@ def fetch_student_data(name):
             "marks": "Error",
             "total_marks": "Error"
         }
+
+def insert_student_data(name, subject, marks, total_marks):
+    conn = get_db_connection()
+    if not conn:
+        logging.error("❌ No database connection available")
+        return False
+
+    try:
+        cursor = conn.cursor()
+        query = "INSERT INTO students (name, subject, marks, total_marks) VALUES (%s, %s, %s, %s)"
+        cursor.execute(query, (name, subject, marks, total_marks))
+        conn.commit()
+        cursor.close()
+        conn.close()  # ✅ Ensuring the connection is properly closed
+        logging.info(f"✅ Successfully inserted student data: {name}")
+        return True
+
+    except mysql.connector.Error as err:
+        logging.error(f"❌ Error inserting student data: {err}")
+        return False
+
 def create_app():
     app = Flask(__name__)
 
@@ -98,6 +122,20 @@ def create_app():
         student_data = fetch_student_data(name)
         return render_template("student.html", name=name, student=student_data)
 
+    @app.route("/add_student", methods=["GET", "POST"])
+    def add_student():
+        if request.method == "POST":
+            name = request.form["name"]
+            subject = request.form["subject"]
+            marks = request.form["marks"]
+            total_marks = request.form["total_marks"]
+
+            success = insert_student_data(name, subject, marks, total_marks)
+            if success:
+                return redirect(url_for("index"))  # ✅ Redirect to home after successful insert
+
+        return render_template("add_student.html", success=None)
+
     return app
 
 app = create_app()
@@ -105,5 +143,4 @@ app = create_app()
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
     logging.info(f"🚀 Running Flask app on port {port} with Waitress")
-    serve(app, host="192.168.206.76", port=port)  # Updated IP
-    logging.info("FLask app is running sucessfully") 
+    serve(app, host="192.168.206.76", port=port)
