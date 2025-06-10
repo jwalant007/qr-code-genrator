@@ -2,37 +2,39 @@ import os
 import mysql.connector
 import qrcode
 import logging
-import warnings  # ✅ Suppress warnings globally
+import warnings
 from flask import Flask, render_template, request, send_file
 from waitress import serve
 from io import BytesIO
 
-# ✅ Suppress all warnings
+# ✅ Suppress warnings globally
 warnings.filterwarnings("ignore")
 
 # ✅ Set up logging
 logging.basicConfig(level=logging.INFO)
 
 def get_db_connection():
-    
     try:
         conn = mysql.connector.connect(
             host=os.getenv("DB_HOST", "152.58.35.76"),
             user=os.getenv("DB_USER", "root"),
             password=os.getenv("DB_PASSWORD", "Jwalant_007"),
             database=os.getenv("DB_NAME", "listdb"),
-            port=os.getenv("DB_PORT", "3306")
+            port=int(os.getenv("DB_PORT", "3306")),
+            connect_timeout=10  # Set timeout to prevent hanging connections
         )
-        print("Connected to database")
+        
         if conn.is_connected():
             logging.info("✅ Database connection successful")
-        return conn
+            return conn
+        else:
+            logging.error("❌ Connection failed")
+            return None
     except mysql.connector.Error as err:
         logging.error(f"❌ Database connection error: {err}")
         return None
 
 def fetch_student_data(name):
-    
     conn = get_db_connection()
     if not conn:
         logging.error("❌ No database connection available")
@@ -42,12 +44,13 @@ def fetch_student_data(name):
             "marks": "N/A",
             "total_marks": "N/A"
         }
+    
     try:
         cursor = conn.cursor(dictionary=True)
         query = "SELECT name, subject, marks, total_marks FROM students WHERE LOWER(name) = LOWER(%s)"
         cursor.execute(query, (name.strip(),))
         result = cursor.fetchone()
-       
+        
 
         logging.info(f"✅ Retrieved student data: {result}")
         return result if result else {
@@ -66,7 +69,6 @@ def fetch_student_data(name):
         }
 
 def create_app():
-    
     app = Flask(__name__)
 
     @app.route("/", methods=["GET", "POST"])
@@ -79,9 +81,8 @@ def create_app():
 
     @app.route("/generate_qr/<name>")
     def generate_qr(name):
-      
         qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
-    '''
+
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
         qr.add_data(qr_url)
         qr.make(fit=True)
@@ -91,7 +92,7 @@ def create_app():
         img.save(qr_io, format="PNG")
         qr_io.seek(0)
 
-        return send_file(qr_io, mimetype="image/png")'''
+        return send_file(qr_io, mimetype="image/png")
 
     @app.route("/student/<name>")
     def display_student(name):
@@ -105,4 +106,4 @@ app = create_app()
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
     logging.info(f"🚀 Running Flask app on port {port} with Waitress")
-    serve(app, host="0.0.0.0", port=port)
+    serve(app, host="152.58.35.76", port=port)
