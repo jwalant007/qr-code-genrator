@@ -79,6 +79,8 @@ def create_app():
 
     @app.route("/", methods=["GET", "POST"])
     def index():
+        return "<h1>✅ Flask is running!</h1>"
+
         qr_path = ""
         if request.method == "POST":
             name = request.form["name"]
@@ -121,7 +123,7 @@ def create_app():
             if success:
                 return redirect(url_for("index"))  # ✅ Redirect to home if insert succeeds
 
-        return render_template("add_student.html", success=success)
+        return render_template("add-student.html", success=success)
 
     @app.route("/health")
     def health_check():
