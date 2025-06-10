@@ -91,3 +91,4 @@ if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
     logging.info(f"🚀 Running Flask app on port {port} with Waitress")
     app.run(debug=True)  # ✅ Enabled Debug Mode for error visibility
+    serve(app, host="192.168.206.76", port=port)
