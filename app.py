@@ -81,6 +81,7 @@ def create_app():
     def generate_qr(name):
       
         qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
+    '''
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
         qr.add_data(qr_url)
         qr.make(fit=True)
@@ -97,7 +98,7 @@ def create_app():
         student_data = fetch_student_data(name)
         return render_template("student.html", name=name, student=student_data)
 
-    return app
+    return app'''
 
 app = create_app()
 
