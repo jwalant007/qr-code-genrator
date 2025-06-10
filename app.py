@@ -14,7 +14,7 @@ warnings.filterwarnings("ignore")
 logging.basicConfig(level=logging.INFO)
 
 # ✅ Create Flask app with static file serving enabled
-app = Flask(__name__, static_url_path='/static')
+app = Flask(__name__, template_folder="templates", static_url_path="/static")
 
 def get_db_connection():
     try:
