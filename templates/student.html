@@ -1,48 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Details</title>
+    <title>Marksheet</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        table {
+            width: 50%;
+            border-collapse: collapse;
+            margin: 20px auto;
             text-align: center;
-            margin: 50px;
         }
-        .container {
-            max-width: 400px;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            box-shadow: 2px 2px 12px rgba(0,0,0,0.2);
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
         }
-        h2 {
-            color: #333;
-        }
-        p {
-            font-size: 18px;
-            line-height: 1.6;
+        th {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>Student Information</h2>
-        
-        {% if student %}
-            <p><strong>Name:</strong> {{ student.name }}</p>
-            <p><strong>Subject:</strong> {{ student.subject }}</p>
-            <p><strong>Marks:</strong> {{ student.marks }}</p>
-            <p><strong>Total Marks:</strong> {{ student.total_marks }}</p>
-        {% else %}
-            <p>No data found for the requested student.</p>
-        {% endif %}
-        
-        <a href="/">Go Back</a>
-    </div>
+    <h2 style="text-align: center;">Student Marksheet</h2>
+    
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Subject</th>
+            <th>Marks</th>
+            <th>Total Marks</th>
+        </tr>
+        <tr>
+            <td>John Doe</td>
+            <td>Math</td>
+            <td>85</td>
+            <td>100</td>
+        </tr>
+        <tr>
+            <td>Jane Doe</td>
+            <td>Science</td>
+            <td>90</td>
+            <td>100</td>
+        </tr>
+        <tr>
+            <td>Mike Ross</td>
+            <td>English</td>
+            <td>80</td>
+            <td>100</td>
+        </tr>
+    </table>
 
 </body>
 </html>
