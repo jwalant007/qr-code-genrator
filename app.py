@@ -92,7 +92,7 @@ def insert_student_data(name, subject, marks, total_marks):
         return False
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, static_url_path='/static')
 
     @app.route("/", methods=["GET", "POST"])
     def index():

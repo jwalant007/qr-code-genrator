@@ -1,59 +1,53 @@
-        <html>
-        <head>
-            <title>QR Code Display</title>
-             <style>
-    .container {
-        max-width: 400px;
-        margin: auto;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.1);
-    }
-    input, button {
-        width: 100%;
-        padding: 10px;
-        margin: 5px 0;
-    }
-    button {
-        background-color: #28a745;
-        color: white;
-        border: none;
-        cursor: pointer;
-    }
-    button:hover {
-        background-color: #000000;
-    }
-</style>
-<script>
-   function validateForm() {
-            let name = document.forms["studentForm"]["name"].value;
-            let subject = document.forms["studentForm"]["subject"].value;
-            let marks = document.forms["studentForm"]["marks"].value;
-            let totalMarks = document.forms["studentForm"]["total_marks"].value;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>QR Code Display</title>
 
-            if (name === "" || subject === "" || marks === "" || totalMarks === "") {
-                alert("❌ All fields must be filled out!");
-                return false;
-            }
-
-            if (isNaN(marks) || isNaN(totalMarks)) {
-                alert("❌ Marks and Total Marks must be numbers!");
-                return false;
-            }
-
-            return confirm("Are you sure you want to submit the data?");
+    <style>
+        body {
+            background-image: url('/static/wood-wall-background.png'); /* ✅ Fixed path */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
-    </script>
-        </head>
-        <body style="background-image: url('C:\xampp\htdocs\static\wood wall background.png'); background-size: cover; background-position: center;">
-            <nav>
-               <a href="/">🏠 Home</a> |
-               <a href="/add_student">➕ Add Student</a> |
-            </nav>
+        .container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.8); /* ✅ Adds slight transparency */
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #000000;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="/">🏠 Home</a> |
+        <a href="/add_student">➕ Add Student</a> |
+    </nav>
+
     <div class="container">
-            <center><h1>Generate Student QR Code</h1></center>
-           <form name="studentForm" method="POST" onsubmit="return validateForm()">
+        <h1>Generate Student QR Code</h1>
+        
+        <form name="studentForm" method="POST" onsubmit="return validateForm()">
             <label>Name:</label><br>
             <input type="text" name="name" required autofocus><br><br>
 
@@ -63,15 +57,13 @@
             <label>Marks:</label><br>
             <input type="number" name="marks" required><br><br>
 
-            <label>Total Marks:</label><br>
-            <input type="number" name="total_marks" required><br><br>
-
-            <button type="submit">Generate Qr Code</button>
+            <button type="submit">Generate QR Code</button>
         </form>
-            {% if qr_path %}
-                <h2>Generated QR Code:</h2>
-                <img src="{{ qr_path }}" alt="QR Code">
-            {% endif %}
+
+        {% if qr_path %}
+            <h2>Generated QR Code:</h2>
+            <img src="{{ qr_path }}" alt="QR Code">
+        {% endif %}
     </div>
-        </body>
-        </html>
+</body>
+</html>
