@@ -1,54 +1,51 @@
-
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>QR Code Display</title>
-                 <style>
-        .container {
-            max-width: 400px;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.1);
-        }
-        input, button {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-        }
-        button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #000000;
-        }
-    </style>
-            </head>
-            <body>
-                <nav>
-                   <a href="/">🏠 Home</a> |
-                   <a href="/add_student">➕ Add Student</a> |
-                </nav>
-        <div class="container">
-                <center><h1>Generate Student QR Code</h1></center>
-                <form method="POST">
-                    <label for="name">Enter Student Name:</label><br
-                    <input type="text" id="name" name="name" required>
-                    <label for="name">Enter Subject Name:</label><br
-                    <input type="text" id="subject" name="subject" required>
-                    <label for="name">Enter Marks:</label><br>
-                    <input type="number" id="marks" name="marks" required>
-                    <button type="submit">Generate QR Code</button><br
-                </form>
-                {% if qr_path %}
-                    <h2>Generated QR Code:</h2>
-                    <img src="{{ qr_path }}" alt="QR Code">
-                {% endif %}
-        </div>
-            </body>
-            </html>
-            
+        <html>
+        <head>
+            <title>QR Code Display</title>
+             <style>
+    .container {
+        max-width: 400px;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.1);
+    }
+    input, button {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+    }
+    button {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #000000;
+    }
+</style>
+        </head>
+        <body>
+            <nav>
+               <a href="/">🏠 Home</a> |
+               <a href="/add_student">➕ Add Student</a> |
+            </nav>
+    <div class="container">
+            <center><h1>Generate Student QR Code</h1></center>
+            <form method="POST">
+                <label for="name">Enter Student Name:</label><br
+                <input type="text" id="name" name="name" required>
+                <label for="name">Enter Subject Name:</label><br
+                <input type="text" id="subject" name="subject" required>
+                <label for="name">Enter Marks:</label><br>
+                <input type="number" id="marks" name="marks" required>
+                <button type="submit">Generate QR Code</button><br
+            </form>
+            {% if qr_path %}
+                <h2>Generated QR Code:</h2>
+                <img src="{{ qr_path }}" alt="QR Code">
+            {% endif %}
+    </div>
+        </body>
+        </html>
