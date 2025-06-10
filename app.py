@@ -91,14 +91,14 @@ def create_app():
         img.save(qr_io, format="PNG")
         qr_io.seek(0)
 
-        return send_file(qr_io, mimetype="image/png")
+        return send_file(qr_io, mimetype="image/png")'''
 
     @app.route("/student/<name>")
     def display_student(name):
         student_data = fetch_student_data(name)
         return render_template("student.html", name=name, student=student_data)
 
-    return app'''
+    return app
 
 app = create_app()
 
