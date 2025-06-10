@@ -134,7 +134,7 @@ def create_app():
             if success:
                 return redirect(url_for("index"))  # ✅ Redirect to home after successful insert
 
-        return render_template("add_student.html", success=None)
+        return render_template("add-student.html", success=None)
 
     return app
 
