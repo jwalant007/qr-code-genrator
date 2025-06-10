@@ -79,7 +79,6 @@ def create_app():
 
     @app.route("/", methods=["GET", "POST"])
     def index():
-        return "<h1>✅ Flask is running!</h1>"
 
         qr_path = ""
         if request.method == "POST":
