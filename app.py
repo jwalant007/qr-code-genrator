@@ -106,5 +106,5 @@ app = create_app()
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
     logging.info(f"🚀 Running Flask app on port {port} with Waitress")
-    serve(app, host="192.168.206.76", port=port)  # Updated IP
+    serve(app, host="152.58.35.76", port=port)  # Updated IP
     logging.info("FLask app is running sucessfully") 
