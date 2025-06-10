@@ -14,7 +14,7 @@ warnings.filterwarnings("ignore")
 logging.basicConfig(level=logging.INFO)
 
 # ✅ Create Flask app with static file serving enabled
-app = Flask(__name__, template_folder="templates", static_url_path="/static")
+app = Flask(__name__, static_url_path='/static', template_folder="templates")
 
 def get_db_connection():
     try:
@@ -36,43 +36,23 @@ def get_db_connection():
     except mysql.connector.Error as err:
         logging.error(f"❌ Database connection error: {err}")
         return None
-    
-def fetch_student_data(name):
-    conn = get_db_connection()
-    if not conn:
-        logging.error("❌ No database connection available")
-        return {
-            "name": name,
-            "subject": "N/A",
-            "marks": "N/A",
-            "total_marks": "N/A"
-        }
-    else:
-        logging.info("Connected to database successfully")
 
+@app.route("/")
+def index():
     try:
-        cursor = conn.cursor(dictionary=True)
-        query = "SELECT name, subject, marks, total_marks FROM students WHERE LOWER(name) = LOWER(%s)"
-        cursor.execute(query, (name.strip(),))
-        result = cursor.fetchone()
-        
-        logging.info(f"✅ Retrieved student data: {result}")
-        conn.close()  # ✅ Close connection after fetching data
+        # ✅ Test database connection before rendering the template
+        conn = get_db_connection()
+        if not conn:
+            return "<h1>❌ Database connection failed</h1>", 500
+        conn.close()  # ✅ Close connection after check
+        return render_template("index.html")
+    except Exception as e:
+        logging.error(f"❌ Exception occurred: {str(e)}")
+        return f"<h1>❌ Internal Server Error</h1><p>{str(e)}</p>", 500
 
-        return result if result else {
-            "name": name,
-            "subject": "N/A",
-            "marks": "Not Available",
-            "total_marks": "Not Available"
-        }
-    except mysql.connector.Error as err:
-        logging.error(f"❌ Error fetching student data: {err}")
-        return {
-            "name": name,
-            "subject": "N/A",
-            "marks": "Error",
-            "total_marks": "Error"
-        }
+@app.route("/health")
+def health_check():
+    return "<h1>🚀 Flask app is running!</h1>"
 
 def insert_student_data(name, subject, marks, total_marks):
     conn = get_db_connection()
@@ -93,10 +73,6 @@ def insert_student_data(name, subject, marks, total_marks):
         logging.error(f"❌ Error inserting student data: {err}")
         return False
 
-@app.route("/")
-def index():
-    return render_template("qr_code.html")
-
 @app.route("/add_student", methods=["GET", "POST"])
 def add_student():
     if request.method == "POST":
@@ -114,4 +90,4 @@ def add_student():
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
     logging.info(f"🚀 Running Flask app on port {port} with Waitress")
-    serve(app, host="192.168.206.76", port=port)
+    app.run(debug=True)  # ✅ Enabled Debug Mode for error visibility
