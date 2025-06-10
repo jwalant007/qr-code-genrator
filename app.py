@@ -33,41 +33,40 @@ def get_db_connection():
     except mysql.connector.Error as err:
         logging.error(f"❌ Database connection error: {err}")
         return None
-
+    
 def fetch_student_data(name):
     conn = get_db_connection()
     if not conn:
         logging.error("❌ No database connection available")
         return {
             "name": name,
-            "subject": "g",
+            "subject": "N/A",
             "marks": "N/A",
             "total_marks": "N/A"
         }
-    
+
     try:
         cursor = conn.cursor(dictionary=True)
         query = "SELECT name, subject, marks, total_marks FROM students WHERE LOWER(name) = LOWER(%s)"
         cursor.execute(query, (name.strip(),))
         result = cursor.fetchone()
         
-        
         logging.info(f"✅ Retrieved student data: {result}")
         return result if result else {
             "name": name,
-            "subject": "f",
+            "subject": "N/A",
             "marks": "Not Available",
             "total_marks": "Not Available"
         }
+
     except mysql.connector.Error as err:
         logging.error(f"❌ Error fetching student data: {err}")
         return {
             "name": name,
-            "subject": "e",
-            "marks": "N/A",
-            "total_marks": "N/A"
+            "subject": "N/A",
+            "marks": "Error",
+            "total_marks": "Error"
         }
-
 def create_app():
     app = Flask(__name__)
 
