@@ -25,10 +25,11 @@
 </head>
 <body>
     <nav>
-        <center> <a href="/">🏠 Home</a> |</center>
-        <center> <a href="/add_student">➕ Add Student</a> </center>|
-    </nav>
+        <a href="/">🏠 Home</a> |
+        <a href="/add_student">➕ Add Student</a> |
+        </nav>
 
+   <div class="container">     
     <h2>Add New Student</h2>
     {% if success is not none %}
         <p>
@@ -55,5 +56,6 @@
 
         <button type="submit">Add Student</button>
     </form>
+   </div>
 </body>
 </html>
