@@ -44,7 +44,8 @@ def fetch_student_data(name):
             "marks": "N/A",
             "total_marks": "N/A"
         }
-
+    else:
+        logging.info("Connected to database successfully")
     try:
         cursor = conn.cursor(dictionary=True)
         query = "SELECT name, subject, marks, total_marks FROM students WHERE LOWER(name) = LOWER(%s)"
@@ -105,4 +106,5 @@ app = create_app()
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
     logging.info(f"🚀 Running Flask app on port {port} with Waitress")
-    serve(app, host="0.0.0.0", port=port)
+    serve(app, host="152.58.35.76", port=port)  # Updated IP
+    logging.info("FLask app is running sucessfully") 
