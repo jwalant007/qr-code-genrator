@@ -55,6 +55,7 @@ def insert_student_data(name, subject, marks, total_marks):
 
 def fetch_student_data(name):
     conn = get_db_connection()
+    print(conn.is_connected())
     if not conn:
         logging.error("❌ No database connection available")
         return {"name": name, "subject": "N/A", "marks": "N/A", "total_marks": "N/A"}
@@ -134,4 +135,5 @@ if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
     logging.info(f"🚀 Running Flask app on port {port} with Waitress")
     serve(app, host="192.168.206.76", port=port)
+    app.run(debug=True)
     logging.info("✅ Flask app is running successfully")
