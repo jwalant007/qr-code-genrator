@@ -7,7 +7,7 @@ from flask import Flask, render_template, request, send_file, redirect, url_for
 from waitress import serve
 from io import BytesIO
 from dotenv import load_dotenv
-from flask_caching import Cache
+from flask_caching import Cache  # ✅ Added Flask-Caching
 
 # ✅ Load environment variables
 load_dotenv()
@@ -21,15 +21,17 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 # ✅ Initialize Flask App
 app = Flask(__name__)
 
-# ✅ Configure Cache (Simple in-memory)
-cache = Cache(app, config={"CACHE_TYPE": "SimpleCache", "CACHE_DEFAULT_TIMEOUT": 300})
+# ✅ Configure Caching (SimpleCache)
+app.config["CACHE_TYPE"] = "SimpleCache"
+app.config["CACHE_DEFAULT_TIMEOUT"] = 300  # Cache expires in 5 minutes
+cache = Cache(app)
 
 
 def get_db_connection():
     """Establish a pooled database connection."""
     try:
         conn = mysql.connector.connect(
-            host=os.getenv("DB_HOST", "localhost"),
+            host=os.getenv("DB_HOST", "192.168.206.76"),
             user=os.getenv("DB_USER", "root"),
             password=os.getenv("DB_PASSWORD", ""),
             database=os.getenv("DB_NAME", "listdb"),
@@ -56,7 +58,8 @@ def insert_student_data(name, subject, marks, total_marks):
         cursor.execute(query, (name, subject, marks, total_marks))
         conn.commit()
         logging.info(f"✅ Successfully inserted student: {name}")
-        cache.delete(f"student_{name.lower()}")  # ✅ Invalidate cache
+
+        cache.delete(f"student_{name.lower()}")  # ✅ Invalidate cache upon data update
         return True
     except mysql.connector.Error as err:
         logging.error(f"❌ Error inserting student data: {err}")
@@ -66,7 +69,7 @@ def insert_student_data(name, subject, marks, total_marks):
         conn.close()
 
 
-@cache.memoize(300)
+@cache.memoize(300)  # ✅ Cached for 5 minutes
 def fetch_student_data(name):
     """Fetch student data with caching to reduce database queries."""
     conn = get_db_connection()
