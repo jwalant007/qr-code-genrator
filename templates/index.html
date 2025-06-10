@@ -5,10 +5,8 @@
 
     <style>
         body {
-            background-image: url('/static/wood-wall-background.png'); /* ✅ Fixed path */
+            background: #f4f4f4 url('/static/wood-wall-background.png') no-repeat center center; /* ✅ Fixed path */
             background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
         }
         .container {
             max-width: 400px;
@@ -34,6 +32,10 @@
         }
         button:hover {
             background-color: #000000;
+        }
+        img {
+            max-width: 100%; /* ✅ Make QR Code responsive */
+            height: auto;
         }
     </style>
 </head>
