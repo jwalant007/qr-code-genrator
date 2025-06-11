@@ -61,7 +61,6 @@ def fetch_student_data(name):
         logging.error(f"Error fetching student data: {err}")
         return {"name": name, "subject": "N/A", "marks": "Error", "total_marks": "Error"}
     finally:
-        cursor.close()
         conn.close()
 
 def generate_qr_code(url):
@@ -86,6 +85,7 @@ def index():
 def generate_qr(name):
     qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
+    qr_io = generate_qr_code(qr_url)
     qr.add_data(qr_url)
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
