@@ -1,25 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Student Search</title>
+    <title>QR Code Display</title>
     <style>
-        .container {
-            max-width: 600px;
-            margin: 40px auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+        body {
+            background-color: #f5f5f5;
             font-family: Arial, sans-serif;
         }
+        .container {
+            max-width: 400px;
+            margin: 40px auto;
+            padding: 20px;
+            border: 1px solid #050404;
+            border-radius: 8px;
+            box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.95);
+        }
+        input, button {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #000000;
+            transform: scale(1.05);
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 15px;
+        }
+        nav {
+            text-align: center;
+            margin-top: 20px;
+        }
+        nav a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #007bff;
+        }
     </style>
+
+    <script>
+        function validateForm() {
+            let form = document.forms["studentForm"];
+            let name = form["name"].value.trim();
+            let subject = form["subject"].value.trim();
+            let marks = form["marks"].value.trim();
+            let totalMarks = form["total_marks"].value.trim();
+
+            if (name === "" || subject === "" || marks === "" || totalMarks === "") {
+                alert("All fields must be filled out!");
+                return false;
+            }
+
+            if (isNaN(marks) || isNaN(totalMarks)) {
+                alert("Marks and Total Marks must be numbers!");
+                return false;
+            }
+
+            return confirm("Are you sure you want to submit the data?");
+        }
+    </script>
 </head>
 <body>
+    <nav>
+        <a href="/">Home</a> |
+        <a href="/add_student">Add Student</a>
+    </nav>
+
     <div class="container">
-        <h2>Search Student by Name</h2>
-        <form method="POST" action="/">
-            <input type="text" name="name" placeholder="Enter name" required>
-            <input type="submit" value="Search">
+        <h1>Generate Student QR Code</h1>
+        <form name="studentForm" method="POST" action="/generate_qr" onsubmit="return validateForm()">
+            <label>Name:</label>
+            <input type="text" name="name" required autofocus>
+
+            <label>Subject:</label>
+            <input type="text" name="subject" required>
+
+            <label>Marks:</label>
+            <input type="number" name="marks" required>
+
+            <label>Total Marks:</label>
+            <input type="number" name="total_marks" required>
+
+            <button type="submit">Generate QR Code</button>
         </form>
+
+        {% if qr_path %}
+            <h2>Generated QR Code:</h2>
+            <img src="{{ qr_path }}" alt="QR Code">
+        {% endif %}
     </div>
 </body>
 </html>
