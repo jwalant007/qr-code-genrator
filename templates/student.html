@@ -24,7 +24,10 @@
         <p><strong>Subject:</strong> {{ student.subject }}</p>
         <p><strong>Marks:</strong> {{ student.marks }}</p>
         <p><strong>Total Marks:</strong> {{ student.total_marks }}</p>
-        <img src="{{ url_for('generate_qr_from_form') }}" alt="QR Code" onerror="this.style.display='none'">
+        <form method="POST" action="/generate_qr">
+            <input type="hidden" name="name" value="{{ student.name }}">
+            <button type="submit">Generate QR Code</button>
+        </form>
     </div>
 </body>
 </html>

@@ -76,13 +76,17 @@ def generate_qr_code(url):
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
-        name = request.form["name"]
+        name = request.form.get("name", "").strip()
+        if not name:
+            return "Error: Name is required", 400
         return redirect(url_for("display_student", name=name))
     return render_template("index.html")
 
 @app.route("/generate_qr", methods=["POST"])
 def generate_qr_from_form():
-    name = request.form["name"]
+    name = request.form.get("name", "").strip()
+    if not name:
+        return "Error: Name is required", 400
     qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
     qr_io = generate_qr_code(qr_url)
     return send_file(qr_io, mimetype="image/png")
