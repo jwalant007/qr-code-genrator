@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>Student Details</title>
     <style>
         .container {
             max-width: 600px;
-            margin: 50px auto;
+            margin: 40px auto;
             padding: 20px;
             border: 1px solid #ccc;
             border-radius: 10px;
@@ -24,7 +24,7 @@
         <p><strong>Subject:</strong> {{ student.subject }}</p>
         <p><strong>Marks:</strong> {{ student.marks }}</p>
         <p><strong>Total Marks:</strong> {{ student.total_marks }}</p>
-        <img src="{{ url_for('generate_qr', name=name) }}" alt="QR Code for Student">
+        <img src="{{ url_for('generate_qr_from_form') }}" alt="QR Code" onerror="this.style.display='none'">
     </div>
 </body>
 </html>
