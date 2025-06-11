@@ -75,18 +75,16 @@ def generate_qr_code(url):
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    qr_path = ""
     if request.method == "POST":
         name = request.form["name"]
-        qr_path = f"/generate_qr/{name}"
-    return render_template("index.html", qr_path=qr_path)
+        return redirect(url_for("display_student", name=name))
+    return render_template("index.html")
 
 @app.route("/generate_qr/<name>")
 def generate_qr(name):
     qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
     qr_io = generate_qr_code(qr_url)
-    qr.add_data(qr_url)
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
     qr_io = BytesIO()
