@@ -73,29 +73,34 @@ def generate_qr_code(url):
     qr_io.seek(0)
     return qr_io
 
-@app.route("/", methods=["GET", "POST"])
-def index():
-    if request.method == "POST":
-        name = request.form["name"]
-        return redirect(url_for("display_student", name=name))
-    return render_template("index.html")
+    @app.route("/", methods=["GET", "POST"])
+    def index():
+        qr_path = ""
+        if request.method == "POST":
+            name = request.form["name"]
+            qr_path = f"/generate_qr/{name}"
+        return render_template("index.html", qr_path=qr_path)
 
 @app.route("/generate_qr/<name>")
 def generate_qr(name):
-    qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
-    qr = qrcode.QRCode(version=1, box_size=10, border=5)
-    qr_io = generate_qr_code(qr_url)
-    qr.make(fit=True)
-    img = qr.make_image(fill_color="black", back_color="white")
-    qr_io = BytesIO()
-    img.save(qr_io, format="PNG")
-    qr_io.seek(0)
-    return send_file(qr_io, mimetype="image/png")
+        """Generate a QR code dynamically"""
+        qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
+        qr = qrcode.QRCode(version=1, box_size=10, border=5)
+        qr.add_data(qr_url)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+
+        qr_io = BytesIO()
+        img.save(qr_io, format="PNG")
+        qr_io.seek(0)
+
+        return send_file(qr_io, mimetype="image/png")
 
 @app.route("/student/<name>")
 def display_student(name):
-    student_data = fetch_student_data(name)
-    return render_template("student.html", name=name, student=student_data)
+        """Fetch and display a specific student's data"""
+        student = fetch_student_data(name)
+        return render_template("student.html", student=student)
 
 @app.route("/add_student", methods=["GET", "POST"])
 def add_student():
