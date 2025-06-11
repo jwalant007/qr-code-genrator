@@ -1,48 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Details</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 50px;
-        }
         .container {
-            max-width: 400px;
-            margin: auto;
+            max-width: 600px;
+            margin: 40px auto;
             padding: 20px;
-            border: 1px solid #ddd;
+            border: 1px solid #ccc;
             border-radius: 10px;
-            box-shadow: 2px 2px 12px rgba(0,0,0,0.2);
+            font-family: Arial, sans-serif;
         }
-        h2 {
-            color: #333;
-        }
-        p {
-            font-size: 18px;
-            line-height: 1.6;
+        img {
+            display: block;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-
     <div class="container">
         <h2>Student Information</h2>
-        
-        {% if student %}
-            <p><strong>Name:</strong> {{ student.name }}</p>
-            <p><strong>Subject:</strong> {{ student.subject }}</p>
-            <p><strong>Marks:</strong> {{ student.marks }}</p>
-            <p><strong>Total Marks:</strong> {{ student.total_marks }}</p>
-        {% else %}
-            <p>No data found for the requested student.</p>
-        {% endif %}
-        
-        <a href="/">Go Back</a>
+        <p><strong>Name:</strong> {{ student.name }}</p>
+        <p><strong>Subject:</strong> {{ student.subject }}</p>
+        <p><strong>Marks:</strong> {{ student.marks }}</p>
+        <p><strong>Total Marks:</strong> {{ student.total_marks }}</p>
+        <img src="{{ url_for('generate_qr_from_form') }}" alt="QR Code" onerror="this.style.display='none'">
     </div>
-
 </body>
 </html>
