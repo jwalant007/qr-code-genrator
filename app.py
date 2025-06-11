@@ -80,8 +80,9 @@ def index():
         return redirect(url_for("display_student", name=name))
     return render_template("index.html")
 
-@app.route("/generate_qr/<name>")
-def generate_qr(name):
+@app.route("/generate_qr", methods=["POST"])
+def generate_qr_from_form():
+    name = request.form["name"]
     qr_url = f"https://qr-code-genrator-xpcv.onrender.com/student/{name}"
     qr_io = generate_qr_code(qr_url)
     return send_file(qr_io, mimetype="image/png")
@@ -93,7 +94,6 @@ def display_student(name):
 
 @app.route("/add_student", methods=["GET", "POST"])
 def add_student():
-    success = None
     if request.method == "POST":
         name = request.form["name"]
         subject = request.form["subject"]
@@ -101,9 +101,9 @@ def add_student():
         total_marks = request.form["total_marks"]
         success = insert_student_data(name, subject, marks, total_marks)
         if success:
-            return redirect(url_for("index"))
-    return render_template("add-student.html", success=success)
-
+            return redirect(url_for("display_student", name=name))
+    return render_template("add-student.html")
+    
 if __name__ == "__main__":
     port = 5000
     logging.info(f"Running Flask app on port {port} with Waitress")
