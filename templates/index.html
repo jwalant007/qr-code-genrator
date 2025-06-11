@@ -2,23 +2,25 @@
 <html lang="en">
 <head>
     <title>QR Code Display</title>
-
     <style>
-        body 
+        body {
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+        }
         .container {
             max-width: 400px;
-            margin: auto;
+            margin: 40px auto;
             padding: 20px;
             border: 1px solid #050404;
             border-radius: 8px;
             box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.1);
             text-align: center;
-            background-color: rgba(255, 255, 255, 0.9); /* ✅ Slight transparency */
+            background-color: rgba(255, 255, 255, 0.95);
         }
         input, button {
             width: 100%;
-            padding: 5px 5px;
-            margin: 5px 0;
+            padding: 8px;
+            margin: 8px 0;
         }
         button {
             background-color: #28a745;
@@ -29,28 +31,39 @@
         }
         button:hover {
             background-color: #000000;
-            transform: scale(1.05); /* ✅ Smooth hover effect */
+            transform: scale(1.05);
         }
         img {
             max-width: 100%;
             height: auto;
+            margin-top: 15px;
+        }
+        nav {
+            text-align: center;
+            margin-top: 20px;
+        }
+        nav a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #007bff;
         }
     </style>
 
     <script>
         function validateForm() {
-            let name = document.forms["studentForm"]["name"].value.trim();
-            let subject = document.forms["studentForm"]["subject"].value.trim();
-            let marks = document.forms["studentForm"]["marks"].value.trim();
-            let totalMarks = document.forms["studentForm"]["total_marks"].value.trim();
+            let form = document.forms["studentForm"];
+            let name = form["name"].value.trim();
+            let subject = form["subject"].value.trim();
+            let marks = form["marks"].value.trim();
+            let totalMarks = form["total_marks"].value.trim();
 
             if (name === "" || subject === "" || marks === "" || totalMarks === "") {
-                alert("❌ All fields must be filled out!");
+                alert("All fields must be filled out!");
                 return false;
             }
 
             if (isNaN(marks) || isNaN(totalMarks)) {
-                alert("❌ Marks and Total Marks must be numbers!");
+                alert("Marks and Total Marks must be numbers!");
                 return false;
             }
 
@@ -60,25 +73,24 @@
 </head>
 <body>
     <nav>
-        <a href="/">🏠 Home</a> |
-        <a href="/add_student">➕ Add Student</a> |
+        <a href="/">Home</a> |
+        <a href="/add_student">Add Student</a>
     </nav>
 
     <div class="container">
         <h1>Generate Student QR Code</h1>
-        
         <form name="studentForm" method="POST" action="/generate_qr" onsubmit="return validateForm()">
-            <label>Name:</label><br>
-            <input type="text" name="name" required autofocus><br><br>
+            <label>Name:</label>
+            <input type="text" name="name" required autofocus>
 
-            <label>Subject:</label><br>
-            <input type="text" name="subject" required><br><br>
+            <label>Subject:</label>
+            <input type="text" name="subject" required>
 
-            <label>Marks:</label><br>
-            <input type="number" name="marks" required><br><br>
+            <label>Marks:</label>
+            <input type="number" name="marks" required>
 
-            <label>Total_Marks:</label><br>
-            <input type="number" name="marks" required><br><br>
+            <label>Total Marks:</label>
+            <input type="number" name="total_marks" required>
 
             <button type="submit">Generate QR Code</button>
         </form>
